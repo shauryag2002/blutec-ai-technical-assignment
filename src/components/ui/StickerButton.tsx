@@ -17,8 +17,9 @@ interface StickerButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 /**
  * StickerButton Component
  * 
- * Tactile, physical pill button with 2px espresso border,
- * unblurred hard offset shadow, and pressed-down physical feedback.
+ * Tactile, physical pill button with thin 1.5px espresso border,
+ * soft bottom-lip shadow (0 3.5px 0 #23170F), and responsive press depression.
+ * Typography: Clean geometric sans-serif (Plus Jakarta Sans, weight 600).
  */
 export const StickerButton: React.FC<StickerButtonProps> = ({
   variant = 'primary',
@@ -31,20 +32,20 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles =
-    "inline-flex items-center justify-center gap-2 font-display font-bold rounded-full border-2 border-espresso transition-all duration-200 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-honey";
+  const baseStyles = 
+    "inline-flex items-center justify-center gap-2 font-sans font-semibold rounded-full border-[1.5px] border-espresso-border transition-all duration-150 select-none cursor-pointer focus:outline-none";
 
   const sizeStyles = {
-    sm: "px-4 py-1.5 text-xs shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-    md: "px-6 py-3 text-sm sm:text-base shadow-hard-md hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-press",
-    lg: "px-8 py-3.5 text-base sm:text-lg shadow-hard-lg hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-press"
+    sm: "px-4 py-1.5 text-xs shadow-lip-sm active:translate-y-[1px] active:shadow-lip-press",
+    md: "px-6 py-2.5 text-sm sm:text-base shadow-lip-md hover:shadow-lip-lg hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-lip-press",
+    lg: "px-8 py-3 text-base sm:text-lg shadow-lip-md hover:shadow-lip-lg hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-lip-press"
   }[size];
 
   const variantStyles = {
-    // Terracotta fill with cream text -> inverts on dark
+    // Terracotta fill with cream text
     primary: "bg-terracotta text-cream-light hover:bg-terracotta-hover",
-    // Cream outline that fills with cream on dark or terracotta on light
-    ghost: "bg-transparent text-espresso hover:bg-cream-soft",
+    // Cream outlined ghost button
+    ghost: "bg-cream-light/80 text-espresso hover:bg-cream-soft",
     // Emerald green for WhatsApp CTA
     whatsapp: "bg-emerald text-white hover:bg-emerald-hover",
     // Cream pill for dark backgrounds
@@ -85,4 +86,3 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
     </button>
   );
 };
-

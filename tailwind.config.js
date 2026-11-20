@@ -14,10 +14,11 @@ export default {
           dark: '#EED9C4',
         },
         espresso: {
-          DEFAULT: '#2A1A14',
-          deep: '#1D120D',
-          soft: '#5A3A28',
-          light: '#785838',
+          DEFAULT: '#23170F',
+          deep: '#1A1009',
+          border: '#3A261B',
+          soft: '#4A3528',
+          muted: '#7A6253',
         },
         terracotta: {
           DEFAULT: '#B8502D',
@@ -27,13 +28,17 @@ export default {
         },
         wood: {
           light: '#D9A773',
-          DEFAULT: '#C68E56',
-          dark: '#A26535',
+          DEFAULT: '#C78E59',
+          dark: '#4A2C20',
+          rust: '#9E4B2E',
+          terracotta: '#B55838',
+          wall: '#3B241A',
         },
         honey: {
           DEFAULT: '#F2BE6B',
           soft: '#FBE3B4',
           deep: '#D8A24A',
+          tan: '#E7C592',
         },
         emerald: {
           DEFAULT: '#1E7F4F',
@@ -56,26 +61,27 @@ export default {
         display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         script: ['Caveat', 'cursive'],
-        hand: ['"Shantell Sans"', 'Caveat', 'ui-rounded', 'cursive'],
       },
       boxShadow: {
-        'hard-sm': '3px 3px 0px #2A1A14',
-        'hard-md': '5px 5px 0px #2A1A14',
-        'hard-lg': '8px 8px 0px #2A1A14',
-        'hard-xl': '12px 12px 0px #2A1A14',
-        'hard-gold': '5px 5px 0px #D8A24A',
-        'hard-cream': '5px 5px 0px #FFFDF8',
-        'hard-press': '1px 1px 0px #2A1A14',
+        // Soft storybook bottom-lip shadows
+        'lip-sm': '0 2px 0 #23170F',
+        'lip-md': '0 3.5px 0 #23170F',
+        'lip-lg': '0 5px 0 #23170F',
+        'lip-press': '0 1px 0 #23170F',
+        // Gentle card elevation
+        'card-soft': '0 4px 14px rgba(35, 23, 15, 0.06), 0 1px 0 #3A261B',
+        'card-hover': '0 8px 24px rgba(35, 23, 15, 0.1), 0 2px 0 #3A261B',
       },
       borderRadius: {
         'pill': '9999px',
-        'arch': '9999px 9999px 12px 12px',
+        'arch': '9999px 9999px 16px 16px',
         'arch-lg': '9999px 9999px 24px 24px',
       },
       animation: {
         'float-slow': 'float 4s ease-in-out infinite',
-        'twinkle': 'twinkle 2s ease-in-out infinite',
-        'wiggle': 'wiggle 1s ease-in-out infinite',
+        'twinkle': 'twinkle 2.2s ease-in-out infinite',
+        'wiggle': 'wiggle 0.45s ease-in-out infinite',
+        'marquee': 'marquee 28s linear infinite',
       },
       keyframes: {
         float: {
@@ -87,8 +93,12 @@ export default {
           '50%': { opacity: 1, transform: 'scale(1.15)' },
         },
         wiggle: {
-          '0%, 100%': { transform: 'rotate(-3deg)' },
-          '50%': { transform: 'rotate(3deg)' },
+          '0%, 100%': { transform: 'rotate(-14deg)' },
+          '50%': { transform: 'rotate(18deg)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
         }
       }
     },

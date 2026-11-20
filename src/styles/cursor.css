@@ -1,29 +1,12 @@
 /**
- * Custom Paw Cursor System
+ * Custom Paw Trail Styles
  * 
- * Only applied when a fine-pointer (mouse/trackpad) device is active.
- * Touchscreen devices automatically fall back to native touch interactions.
+ * Delicate paw-step trail active on fine pointer devices only.
+ * Native touch interactions on mobile/tablet.
  */
 
-@media (pointer: fine) {
-
-  /* Hide the system cursor on interactive elements so our custom paw is visible */
-  a,
-  button,
-  [role="button"],
-  input,
-  select,
-  textarea,
-  .puppy-door,
-  .pushpin-card,
-  [data-cursor="paw"] {
-    cursor: none !important;
-  }
-}
-
-/* Fallback for coarse pointers (touchscreens) */
 @media (pointer: coarse) {
-  .paw-cursor-overlay {
+  .paw-trail-container {
     display: none !important;
   }
 }

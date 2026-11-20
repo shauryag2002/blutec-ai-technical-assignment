@@ -3,120 +3,126 @@
 @tailwind utilities;
 
 :root {
-  /* Core Storybook Palette */
+  /* Warm Storybook Color Palette */
   --color-cream: #FDF6EC;
   --color-cream-light: #FFFDF8;
   --color-cream-soft: #F7E6D0;
-  --color-espresso: #2A1A14;
-  --color-espresso-soft: #5A3A28;
+  --color-espresso: #23170F;
+  --color-espresso-border: #3A261B;
+  --color-espresso-soft: #4A3528;
   --color-terracotta: #B8502D;
   --color-terracotta-hover: #9C3F20;
   --color-terracotta-ink: #8E3F15;
-  --color-wood: #C68E56;
-  --color-wood-light: #D9A773;
+  --color-wood: #C78E59;
   --color-emerald: #1E7F4F;
   --color-emerald-hover: #16633D;
   --color-honey: #F2BE6B;
   --color-honey-soft: #FBE3B4;
   --color-honey-deep: #D8A24A;
+  --color-honey-tan: #E7C592;
   --color-sky: #BFDDF5;
   --color-sky-deep: #2F6E9E;
-  --color-blush: #F9CDBF;
 
-  /* Hard offset shadows */
-  --shadow-hard-sm: 3px 3px 0px #2A1A14;
-  --shadow-hard-md: 5px 5px 0px #2A1A14;
-  --shadow-hard-lg: 8px 8px 0px #2A1A14;
-  --shadow-hard-xl: 12px 12px 0px #2A1A14;
+  /* Refined Storybook Bottom-Lip Shadows (Soft Craft Aesthetic) */
+  --shadow-lip-sm: 0 2px 0 #23170F;
+  --shadow-lip-md: 0 3.5px 0 #23170F;
+  --shadow-lip-lg: 0 5px 0 #23170F;
+  --shadow-lip-press: 0 1px 0 #23170F;
 
-  /* Transforms & Transitions */
+  /* Animation Easings */
   --ease-pounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
-  --door-open: 78deg;
 }
 
-/* Custom tactile button utilities */
+/* Headings: Soft Rounded Fraunces Serifs with Ball Terminals */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: 'Fraunces', ui-serif, Georgia, serif;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+  font-feature-settings: "liga" 1, "kern" 1;
+  letter-spacing: -0.02em;
+}
+
+/* Default heading color on light backgrounds, zero-specificity so Tailwind utility classes override cleanly */
+:where(h1, h2, h3, h4, h5, h6, .font-display) {
+  color: var(--color-espresso);
+}
+
+/* Body & UI: Plus Jakarta Sans */
+body {
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  color: var(--color-espresso-soft);
+}
+
+/* Handwritten Script: Caveat */
+.font-script {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+}
+
 @layer components {
+
+  /* Storybook tactile pill button with subtle bottom-lip shadow */
   .sticker-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    border: 2px solid #2A1A14;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    border: 1.5px solid var(--color-espresso-border);
     border-radius: 9999px;
-    box-shadow: var(--shadow-hard-md);
-    transition: transform 0.2s var(--ease-pounce), box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+    box-shadow: var(--shadow-lip-md);
+    transition: transform 0.18s var(--ease-pounce), box-shadow 0.18s ease, background-color 0.18s ease;
     user-select: none;
     cursor: pointer;
   }
 
   .sticker-btn:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: var(--shadow-hard-lg);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lip-lg);
   }
 
   .sticker-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0px #2A1A14;
+    transform: translateY(2px);
+    box-shadow: var(--shadow-lip-press);
   }
 
-  /* Storybook tactile card */
-  .sticker-card {
-    border: 2px solid #2A1A14;
-    border-radius: 1.5rem;
-    box-shadow: var(--shadow-hard-md);
+  /* Refined storybook card with thin warm border & soft bottom shadow */
+  .story-card {
+    border: 1.5px solid var(--color-espresso-border);
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 16px rgba(35, 23, 15, 0.05), 0 2px 0 #3A261B;
     background-color: var(--color-cream-light);
     transition: transform 0.25s var(--ease-pounce), box-shadow 0.25s ease;
   }
 
-  .sticker-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hard-lg);
+  .story-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(35, 23, 15, 0.08), 0 3px 0 #3A261B;
   }
 }
 
-/* Custom diamond grid background */
+/* Diagonal diamond quilt background */
 .bg-diamond-grid {
   background-color: #FDF6EC;
   background-image:
-    repeating-linear-gradient(45deg, transparent 0 46px, rgba(42, 26, 20, 0.05) 46px 48px),
-    repeating-linear-gradient(-45deg, transparent 0 46px, rgba(42, 26, 20, 0.05) 46px 48px);
+    repeating-linear-gradient(45deg, transparent 0 46px, rgba(35, 23, 15, 0.04) 46px 48px),
+    repeating-linear-gradient(-45deg, transparent 0 46px, rgba(35, 23, 15, 0.04) 46px 48px);
 }
 
 .bg-diamond-grid-dark {
-  background-color: #2A1A14;
+  background-color: #23170F;
   background-image:
-    repeating-linear-gradient(45deg, transparent 0 46px, rgba(255, 253, 248, 0.04) 46px 48px),
-    repeating-linear-gradient(-45deg, transparent 0 46px, rgba(255, 253, 248, 0.04) 46px 48px);
+    repeating-linear-gradient(45deg, transparent 0 46px, rgba(255, 253, 248, 0.035) 46px 48px),
+    repeating-linear-gradient(-45deg, transparent 0 46px, rgba(255, 253, 248, 0.035) 46px 48px);
 }
 
-/* Scalloped edge masks & dividers */
-.scallop-top {
-  mask-image: radial-gradient(circle 10px at 10px 0, transparent 0, transparent 10px, black 11px);
-  mask-size: 20px 20px;
-  mask-repeat: repeat-x;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #FDF6EC;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #D9A773;
-  border-radius: 5px;
-  border: 2px solid #FDF6EC;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #C68E56;
+/* Horizontal marquee pause on hover */
+.marquee-container:hover .marquee-track {
+  animation-play-state: paused;
 }

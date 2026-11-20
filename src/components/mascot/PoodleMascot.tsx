@@ -1,67 +1,95 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useEyeTracking } from '../../hooks/useEyeTracking';
 
-export type PoodlePose = 'peek' | 'walk' | 'sit' | 'flip' | 'think' | 'basket';
+export type PoodlePose = 
+  | 'hero-peek'
+  | 'side-walk'
+  | 'signpost-peek'
+  | 'journey-step'
+  | 'passport-stand'
+  | 'shelf-walk'
+  | 'footer-walk'
+  | 'sit'
+  | 'peek'
+  | 'walk'
+  | 'think'
+  | 'basket';
 
 interface PoodleMascotProps {
   pose?: PoodlePose;
   className?: string;
   bubbleText?: string;
-  flipProgress?: number; // Optional 0 to 1 scroll-driven rotation
+  flipProgress?: number;
 }
 
 /**
  * PoodleMascot Component
  * 
- * The illustrated TeddyPups poodle mascot with modular poses:
- * - peek: Peeking over the quilt / windowsill with front paws visible
- * - walk: Walking along the floor with stride animations
- * - sit: Sitting patiently with front paws down
- * - flip: 3D Y-axis spinning pose tied to scroll
- * - think: Sitting thoughtfully with a speech bubble ("hm?", "?", "coming?")
- * - basket: Sleeping cozily in a woven basket under the stars
+ * Richly illustrated SVG poodle with:
+ * - Caramel/golden fur (#D89A5B & #C27E3E shading) with 2px espresso outline (#23170F)
+ * - Cloud-like fluffy top head puff with layered scallops
+ * - Fluffy scalloped ear puffs framing both cheeks
+ * - Cream muzzle patch (#FBF0DF), soft pink rosy cheeks (#F2A2A2)
+ * - Mouse eye-tracking specular highlights (via useEyeTracking hook)
+ * - Rust collar (#A8462A) with cream heart tag
+ * - Fluffy pom-pom tail with interactive hover wiggle
+ * - Distinct section poses (hero-peek, side-walk, signpost-peek, journey-step, passport-stand, footer-walk)
  */
 export const PoodleMascot: React.FC<PoodleMascotProps> = ({
   pose = 'sit',
-  className = 'w-32 h-28',
+  className = 'w-36 h-32',
   bubbleText,
   flipProgress
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Dynamic eye tracking that moves specular highlights toward the mouse cursor
+  const { highlightX, highlightY, pupilX, pupilY } = useEyeTracking(containerRef);
+
+  // Normalize pose mappings
+  const normalizedPose = 
+    pose === 'peek' ? 'hero-peek' :
+    pose === 'walk' ? 'side-walk' :
+    pose === 'think' ? 'journey-step' :
+    pose === 'basket' ? 'footer-walk' :
+    pose;
+
+  const isPeeking = normalizedPose === 'hero-peek' || normalizedPose === 'signpost-peek';
+
   return (
-    <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
-      {/* Optional Speech Bubble */}
+    <div
+      ref={containerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`relative inline-flex items-center justify-center select-none cursor-pointer ${className}`}
+    >
+      {/* Speech Bubble */}
       {bubbleText && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 4 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="absolute -top-10 left-1/2 -translate-x-1/2 bg-cream-light border-2 border-espresso px-3 py-1 rounded-full shadow-hard-sm text-xs font-hand font-bold text-espresso whitespace-nowrap z-10"
+          className="absolute -top-11 left-1/2 -translate-x-1/2 bg-cream-light border-[1.5px] border-espresso-border px-3.5 py-1 rounded-full shadow-lip-sm text-xs font-sans font-bold text-espresso whitespace-nowrap z-30 pointer-events-none"
         >
           {bubbleText}
-          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-cream-light border-b-2 border-r-2 border-espresso rotate-45" />
+          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-cream-light border-b-[1.5px] border-r-[1.5px] border-espresso-border rotate-45" />
         </motion.div>
       )}
 
-      {/* Basket Back Layer (if pose === 'basket') */}
-      {pose === 'basket' && (
-        <svg aria-hidden="true" viewBox="0 0 300 240" className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          <ellipse cx="212" cy="145" rx="96" ry="12" fill="#8E3F15" />
-          <path d="M116 145 A96 12 0 0 1 308 145" fill="none" stroke="#2A1A14" strokeWidth="3" />
-        </svg>
-      )}
-
-      {/* Main Poodle SVG Body */}
+      {/* Main Mascot Motion Container */}
       <motion.div
         className="w-full h-full flex items-center justify-center"
         animate={
-          pose === 'walk'
-            ? { y: [0, -4, 0] }
-            : pose === 'peek'
-              ? { y: [0, -3, 0] }
-              : {}
+          isPeeking
+            ? { y: [0, -5, 0] }
+            : normalizedPose === 'side-walk' || normalizedPose === 'shelf-walk' || normalizedPose === 'footer-walk'
+            ? { y: [0, -3.5, 0] }
+            : {}
         }
         transition={{
           repeat: Infinity,
-          duration: pose === 'walk' ? 0.6 : 2.5,
+          duration: isPeeking ? 3.5 : 0.6,
           ease: 'easeInOut'
         }}
         style={{
@@ -69,162 +97,227 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
         }}
       >
         <svg
-          viewBox="0 0 300 240"
-          className="w-full h-full overflow-visible z-[1]"
-          aria-label="TeddyPups mascot"
+          viewBox="0 0 280 240"
+          className="w-full h-full overflow-visible"
           role="img"
+          aria-label="TeddyPups illustrated poodle mascot"
         >
-          {/* Shadow (hidden when peeking or in basket) */}
-          {pose !== 'peek' && pose !== 'basket' && (
+          {/* Soft Ground Shadow (for standing/sitting poses) */}
+          {normalizedPose !== 'hero-peek' && (
             <ellipse
-              cx="150"
-              cy="230"
-              rx={pose === 'sit' ? 88 : 75}
+              cx="140"
+              cy="224"
+              rx="78"
               ry="7"
-              fill="#2A1A14"
-              opacity="0.14"
+              fill="#23170F"
+              opacity="0.12"
             />
           )}
 
-          {/* Body & Paws */}
-          <g transform={pose === 'peek' ? 'translate(0, 32)' : 'translate(0, 0)'}>
-            {/* Back Legs (walk / sit) */}
-            {pose !== 'peek' && (
-              <g className="poodle-back-legs">
-                <path
-                  d="M102 185 C102 165 116 150 130 150 C144 150 148 165 148 185 C148 198 142 205 132 205 C122 205 102 202 102 185 Z"
-                  fill="#D9A773"
-                  stroke="#2A1A14"
-                  strokeWidth="3.2"
-                />
-                <path
-                  d="M168 185 C168 165 182 150 196 150 C210 150 214 165 214 185 C214 198 208 205 198 205 C188 205 168 202 168 185 Z"
-                  fill="#D9A773"
-                  stroke="#2A1A14"
-                  strokeWidth="3.2"
-                />
-              </g>
-            )}
-
-            {/* Torso */}
-            <path
-              d="M110 140 C110 100 135 85 150 85 C165 85 190 100 190 140 C190 178 175 196 150 196 C125 196 110 178 110 140 Z"
-              fill="#F2BE6B"
-              stroke="#2A1A14"
-              strokeWidth="3.5"
-            />
-
-            {/* Fluffy Chest bib */}
-            <path
-              d="M130 115 C136 130 144 135 150 135 C156 135 164 130 170 115 C166 142 158 148 150 148 C142 148 134 142 130 115 Z"
-              fill="#FFFDF8"
-              opacity="0.85"
-            />
-
-            {/* Front Paws */}
-            {pose === 'peek' ? (
-              // Paws resting over fence/quilt
-              <g className="poodle-peek-paws">
-                <rect x="115" y="142" width="28" height="22" rx="11" fill="#F2BE6B" stroke="#2A1A14" strokeWidth="3" />
-                <path d="M124 150 v8 M134 150 v8" stroke="#2A1A14" strokeWidth="2.2" strokeLinecap="round" />
-                <rect x="157" y="142" width="28" height="22" rx="11" fill="#F2BE6B" stroke="#2A1A14" strokeWidth="3" />
-                <path d="M166 150 v8 M176 150 v8" stroke="#2A1A14" strokeWidth="2.2" strokeLinecap="round" />
-              </g>
-            ) : (
-              // Standing/Sitting paws
-              <g className="poodle-front-paws">
-                <path
-                  d="M125 160 L125 215 C125 222 131 226 137 226 C143 226 148 222 148 215 L148 160 Z"
-                  fill="#F2BE6B"
-                  stroke="#2A1A14"
-                  strokeWidth="3.2"
-                />
-                <path d="M132 218 v6 M140 218 v6" stroke="#2A1A14" strokeWidth="2.2" strokeLinecap="round" />
-                <path
-                  d="M152 160 L152 215 C152 222 158 226 164 226 C170 226 175 222 175 215 L175 160 Z"
-                  fill="#F2BE6B"
-                  stroke="#2A1A14"
-                  strokeWidth="3.2"
-                />
-                <path d="M159 218 v6 M167 218 v6" stroke="#2A1A14" strokeWidth="2.2" strokeLinecap="round" />
-              </g>
-            )}
-
-            {/* Head & Poodle Curls */}
-            <g className="poodle-head">
-              {/* Fluffy Round Ears */}
+          {/* Pom-Pom Tail with Hover Wiggle */}
+          {normalizedPose !== 'hero-peek' && (
+            <motion.g
+              style={{ transformOrigin: '70px 172px' }}
+              animate={
+                isHovered
+                  ? { rotate: [-14, 18, -14, 18, 0] }
+                  : { rotate: [-3, 3, -3] }
+              }
+              transition={
+                isHovered
+                  ? { repeat: Infinity, duration: 0.45, ease: 'easeInOut' }
+                  : { repeat: Infinity, duration: 2.2, ease: 'easeInOut' }
+              }
+            >
+              {/* Tail Stem */}
               <path
-                d="M84 75 C70 85 70 120 85 135 C96 145 106 135 108 115 C110 95 100 70 84 75 Z"
-                fill="#E4A352"
-                stroke="#2A1A14"
-                strokeWidth="3.2"
+                d="M84 172 C74 165 64 162 56 160"
+                fill="none"
+                stroke="#23170F"
+                strokeWidth="2.5"
+                strokeLinecap="round"
               />
+              {/* Fluffy Pom-Pom Ball at tip */}
+              <circle cx="50" cy="158" r="14" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="46" cy="154" r="8" fill="#F2BE6B" opacity="0.6" />
+            </motion.g>
+          )}
+
+          {/* Back Body & Hind Legs */}
+          {!isPeeking && (
+            <g className="mascot-body">
+              {/* Hind Leg Left */}
               <path
-                d="M216 75 C230 85 230 120 215 135 C204 145 194 135 192 115 C190 95 200 70 216 75 Z"
-                fill="#E4A352"
-                stroke="#2A1A14"
-                strokeWidth="3.2"
+                d="M96 182 C96 164 108 152 120 152 C132 152 136 164 136 184 C136 198 130 204 122 204 C114 204 96 200 96 182 Z"
+                fill="#C27E3E"
+                stroke="#23170F"
+                strokeWidth="2"
+              />
+              {/* Hind Leg Right */}
+              <path
+                d="M156 182 C156 164 168 152 180 152 C192 152 196 164 196 184 C196 198 190 204 182 204 C174 204 156 200 156 182 Z"
+                fill="#C27E3E"
+                stroke="#23170F"
+                strokeWidth="2"
               />
 
-              {/* Main Head Circle */}
-              <circle cx="150" cy="85" r="44" fill="#F2BE6B" stroke="#2A1A14" strokeWidth="3.4" />
-
-              {/* Top Fluff Crown */}
+              {/* Main Fluffy Torso */}
               <path
-                d="M125 52 C120 40 134 34 142 42 C146 32 158 32 162 42 C170 34 182 42 176 52 Z"
-                fill="#F2BE6B"
-                stroke="#2A1A14"
-                strokeWidth="3"
+                d="M104 140 C104 102 126 88 140 88 C154 88 176 102 176 140 C176 174 162 192 140 192 C118 192 104 174 104 140 Z"
+                fill="#D89A5B"
+                stroke="#23170F"
+                strokeWidth="2"
               />
 
-              {/* Eyes */}
-              <circle cx="134" cy="80" r="5.5" fill="#2A1A14" />
-              <circle cx="132" cy="78" r="2" fill="#FFFFFF" />
+              {/* Front Stepping / Sitting Legs */}
+              <g className="front-legs">
+                <rect x="118" y="156" width="16" height="52" rx="8" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+                <path d="M123 202 v4 M129 202 v4" stroke="#23170F" strokeWidth="1.6" strokeLinecap="round" />
 
-              <circle cx="166" cy="80" r="5.5" fill="#2A1A14" />
-              <circle cx="164" cy="78" r="2" fill="#FFFFFF" />
+                <rect x="146" y="156" width="16" height="52" rx="8" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+                <path d="M151 202 v4 M157 202 v4" stroke="#23170F" strokeWidth="1.6" strokeLinecap="round" />
+              </g>
 
-              {/* Cute Eyebrows / Expression */}
-              {pose === 'think' ? (
-                <>
-                  <path d="M128 72 Q134 68 140 72" stroke="#2A1A14" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                  <path d="M160 70 Q166 74 172 70" stroke="#2A1A14" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                </>
-              ) : (
-                <>
-                  <path d="M128 70 Q134 67 140 70" stroke="#2A1A14" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                  <path d="M160 70 Q166 67 172 70" stroke="#2A1A14" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                </>
-              )}
-
-              {/* Snout / Muzzle */}
-              <ellipse cx="150" cy="96" rx="16" ry="12" fill="#FBE3B4" stroke="#2A1A14" strokeWidth="2.8" />
-
-              {/* Nose */}
-              <polygon points="144,92 156,92 150,98" fill="#2A1A14" />
-
-              {/* Mouth & Tongue */}
-              <path d="M150 98 v4.5 M150 102.5 Q145 107.5 141 103 M150 102.5 Q155 107.5 159 103" stroke="#2A1A14" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-              <path d="M146 104 Q150 112 154 104 Z" fill="#F9CDBF" stroke="#2A1A14" strokeWidth="1.8" />
-
-              {/* Rosy Cheeks */}
-              <circle cx="120" cy="94" r="6" fill="#F9CDBF" opacity="0.6" />
-              <circle cx="180" cy="94" r="6" fill="#F9CDBF" opacity="0.6" />
+              {/* Rust Collar with Cream Heart Tag */}
+              <g className="collar">
+                <path
+                  d="M122 134 Q140 144 158 134"
+                  fill="none"
+                  stroke="#A8462A"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                />
+                {/* Heart Tag hanging from collar */}
+                <path
+                  d="M140 142 c-2-3-6-2-5 2 c1 3 5 5 5 5 s4-2 5-5 c1-4-3-5-5-2 z"
+                  fill="#FFFDF8"
+                  stroke="#23170F"
+                  strokeWidth="1.5"
+                />
+              </g>
             </g>
+          )}
+
+          {/* HEAD & FACIAL FEATURES */}
+          <g transform={isPeeking ? 'translate(0, 32)' : 'translate(0, 0)'}>
+            
+            {/* Scalloped Fluffy Ear Puffs Framing Both Cheeks */}
+            {/* Left Ear Puffs */}
+            <g className="left-ear">
+              <circle cx="82" cy="74" r="16" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="74" cy="94" r="18" fill="#C27E3E" stroke="#23170F" strokeWidth="2" />
+              <circle cx="84" cy="114" r="17" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="94" cy="126" r="13" fill="#C27E3E" stroke="#23170F" strokeWidth="2" />
+            </g>
+
+            {/* Right Ear Puffs */}
+            <g className="right-ear">
+              <circle cx="198" cy="74" r="16" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="206" cy="94" r="18" fill="#C27E3E" stroke="#23170F" strokeWidth="2" />
+              <circle cx="196" cy="114" r="17" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="186" cy="126" r="13" fill="#C27E3E" stroke="#23170F" strokeWidth="2" />
+            </g>
+
+            {/* Main Face Base */}
+            <circle cx="140" cy="88" r="48" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+
+            {/* Top Head Cloud Puffs (Layered Soft Scallops) */}
+            <g className="top-puffs">
+              <circle cx="114" cy="48" r="18" fill="#F2BE6B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="140" cy="40" r="22" fill="#F2BE6B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="166" cy="48" r="18" fill="#F2BE6B" stroke="#23170F" strokeWidth="2" />
+              <circle cx="128" cy="42" r="17" fill="#D89A5B" opacity="0.4" />
+              <circle cx="152" cy="42" r="17" fill="#D89A5B" opacity="0.4" />
+            </g>
+
+            {/* Cream-Colored Muzzle Patch */}
+            <ellipse cx="140" cy="100" rx="20" ry="15" fill="#FBF0DF" stroke="#23170F" strokeWidth="2" />
+
+            {/* Prominent Soft Pink Rosy Cheeks */}
+            <circle cx="106" cy="98" r="8.5" fill="#F2A2A2" opacity="0.85" />
+            <circle cx="174" cy="98" r="8.5" fill="#F2A2A2" opacity="0.85" />
+
+            {/* Dark Rounded Eyes with Interactive Eye-Tracking */}
+            {/* Left Eye */}
+            <g className="left-eye">
+              <circle cx="121" cy="82" r="7" fill="#23170F" />
+              {/* Pupil shift */}
+              <motion.circle
+                cx="121"
+                cy="82"
+                r="5.5"
+                fill="#1A1009"
+                style={{ x: pupilX, y: pupilY }}
+              />
+              {/* Crisp White Specular Highlight Dot (tracks mouse) */}
+              <motion.circle
+                cx="119"
+                cy="80"
+                r="2.5"
+                fill="#FFFFFF"
+                style={{ x: highlightX, y: highlightY }}
+              />
+            </g>
+
+            {/* Right Eye */}
+            <g className="right-eye">
+              <circle cx="159" cy="82" r="7" fill="#23170F" />
+              {/* Pupil shift */}
+              <motion.circle
+                cx="159"
+                cy="82"
+                r="5.5"
+                fill="#1A1009"
+                style={{ x: pupilX, y: pupilY }}
+              />
+              {/* Crisp White Specular Highlight Dot (tracks mouse) */}
+              <motion.circle
+                cx="157"
+                cy="80"
+                r="2.5"
+                fill="#FFFFFF"
+                style={{ x: highlightX, y: highlightY }}
+              />
+            </g>
+
+            {/* Rounded-T Dark Brown Nose */}
+            <path
+              d="M133 94 C133 91 147 91 147 94 C147 98 142 101 140 101 C138 101 133 98 133 94 Z"
+              fill="#23170F"
+            />
+
+            {/* Wide Friendly Smile */}
+            <path
+              d="M140 101 v4 M140 105 Q133 111 127 106 M140 105 Q147 111 153 106"
+              fill="none"
+              stroke="#23170F"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+            {/* Subtle Pink Tongue */}
+            <path
+              d="M137 107 Q140 113 143 107 Z"
+              fill="#F2A2A2"
+              stroke="#23170F"
+              strokeWidth="1.2"
+            />
+
+            {/* Two Front Paws Peeking (in hero-peek and signpost-peek) */}
+            {isPeeking && (
+              <g className="peeking-front-paws">
+                {/* Left Paw */}
+                <rect x="100" y="134" width="30" height="22" rx="11" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+                <path d="M109 142 v6 M118 142 v6" stroke="#23170F" strokeWidth="2" strokeLinecap="round" />
+
+                {/* Right Paw */}
+                <rect x="150" y="134" width="30" height="22" rx="11" fill="#D89A5B" stroke="#23170F" strokeWidth="2" />
+                <path d="M159 142 v6 M168 142 v6" stroke="#23170F" strokeWidth="2" strokeLinecap="round" />
+              </g>
+            )}
+
           </g>
         </svg>
       </motion.div>
-
-      {/* Basket Front Layer (if pose === 'basket') */}
-      {pose === 'basket' && (
-        <svg aria-hidden="true" viewBox="0 0 300 240" className="absolute inset-0 w-full h-full pointer-events-none z-[2]">
-          <path d="M116 145 C118 180 126 214 138 232 L286 232 C298 214 306 180 308 145 A96 12 0 0 1 116 145 Z" fill="#C68E56" stroke="#2A1A14" strokeWidth="3" />
-          <path d="M121 178 Q212 197 303 178 M127 206 Q212 223 297 206" fill="none" stroke="#8E3F15" strokeWidth="2.5" />
-          <path d="M150 164 L158 230 M182 168 L185 232 M212 169 V232 M242 168 L239 232 M274 164 L266 230" fill="none" stroke="#5A3A28" strokeWidth="2.5" />
-          <path d="M116 145 A96 12 0 0 0 308 145" fill="none" stroke="#2A1A14" strokeWidth="3.5" />
-        </svg>
-      )}
     </div>
   );
 };
-

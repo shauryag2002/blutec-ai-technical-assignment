@@ -3,27 +3,31 @@ import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { StarryFooter } from './StarryFooter';
 import { RouteTransition } from './RouteTransition';
-import { PawCursor } from '../cursor/PawCursor';
+import { PawTrail } from '../cursor/PawTrail';
 import { useRouteTransition } from '../../hooks/useRouteTransition';
 
 /**
  * Main App Layout Component
  * 
- * Wraps Navbar, RouteTransitionCurtain, main page <Outlet />,
- * StarryFooter, and custom desktop PawCursor.
+ * Features:
+ * - Sticky Navbar with scalloped bottom edge
+ * - Delicate paw-step cursor trail on desktop
+ * - RouteTransition curtain on page load/navigation
+ * - Routed main view <Outlet />
+ * - StarryFooter
  */
 export const Layout: React.FC = () => {
   const { isTransitioning } = useRouteTransition();
 
   return (
     <div className="min-h-screen flex flex-col bg-cream text-espresso selection:bg-honey selection:text-espresso relative">
-      {/* Desktop Fine-Pointer Custom Paw Cursor */}
-      <PawCursor />
+      {/* Delicate Paw Step Trail behind pointer */}
+      <PawTrail />
 
-      {/* Scalloped Curtain Page Transition */}
+      {/* Scalloped Curtain Preloader & Route Transition */}
       <RouteTransition isTransitioning={isTransitioning} />
 
-      {/* Global Navigation Bar */}
+      {/* Sticky Global Navigation */}
       <Navbar />
 
       {/* Routed Page Content */}
@@ -31,9 +35,8 @@ export const Layout: React.FC = () => {
         <Outlet />
       </main>
 
-      {/* Deep Espresso Starry Night Footer */}
+      {/* Continuous Starry Night Footer */}
       <StarryFooter />
     </div>
   );
 };
-
