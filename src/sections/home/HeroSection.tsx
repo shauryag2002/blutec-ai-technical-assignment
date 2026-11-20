@@ -1,174 +1,260 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { MessageCircle, ArrowRight } from 'lucide-react';
-import { StickerButton } from '../../components/ui/StickerButton';
-import { ScallopedDivider } from '../../components/ui/ScallopedDivider';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 import { CONTACT_DETAILS } from '../../data/navigation';
 
-// Varied-height arched puppy portraits with floating rotated breed pills
-const MARQUEE_PUPPIES = [
+interface LineupPuppy {
+  name: string;
+  breed: string;
+  image: string;
+  x: string;
+  w: string;
+  peek: number;
+  tilt: string;
+  slug: string;
+}
+
+const HERO_LINEUP: LineupPuppy[] = [
   {
-    breed: 'Shih Tzu',
-    height: 'h-64 sm:h-72',
-    tilt: '-rotate-2',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2FqNrTCSrsYyzY%2F168fa8c4ff%2Fb942a5_eb14616c76c24da89afe7fa3b7d7ae6a-mv2.jpeg&w=640&q=75'
-  },
-  {
-    breed: 'Pomeranian',
-    height: 'h-72 sm:h-84',
-    tilt: 'rotate-3',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2F3yOfnmoyPooH%2F81e0c7e00c%2Fb942a5_556841b9a73942e5a9d782a683f3bc68-mv2.jpg&w=640&q=75'
-  },
-  {
-    breed: 'Korean Teacup Pomeranian',
-    height: 'h-60 sm:h-68',
-    tilt: '-rotate-1',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2FEsAq2LSRvVCJ%2F4d553ed044%2Fb942a5_a8d264c1aa754d80bc7c98917dfd1fda-mv2.jpg&w=640&q=75'
-  },
-  {
-    breed: 'Maltipoo',
-    height: 'h-76 sm:h-88',
-    tilt: 'rotate-2',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2FZ0ToauDx7Eve%2F5fffe4d022%2Fb942a5_4b8cfb8204d24eadaf524332aba1dc15-mv2.webp&w=640&q=75'
-  },
-  {
-    breed: 'Cavapoo',
-    height: 'h-64 sm:h-74',
-    tilt: '-rotate-3',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2FYQhey4j7uWvZ%2F3ea10db6c1%2Fb942a5_7ce7e7bd18424b6c8fb16dd30113ade2-mv2.jpg&w=640&q=75'
-  },
-  {
+    name: 'Toy Poodle',
     breed: 'Toy Poodle',
-    height: 'h-72 sm:h-80',
-    tilt: 'rotate-1',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2FxeMJCapr5vcU%2Fe618c653b2%2Fb942a5_14376a216177484dbbb27995d0f6aeb7-mv2.jpg&w=640&q=75'
+    image: '/puppies/seat-0.jpg',
+    x: '9%',
+    w: '8.6rem',
+    peek: 0.62,
+    tilt: '-5deg',
+    slug: 'toy-poodle-male-female'
+  },
+  {
+    name: 'Max',
+    breed: 'Maltipoo',
+    image: '/puppies/seat-1.webp',
+    x: '22.5%',
+    w: '10.4rem',
+    peek: 0.8,
+    tilt: '3deg',
+    slug: 'maltipoo-max-male'
+  },
+  {
+    name: 'Korean Teacup Pomeranian',
+    breed: 'Korean Teacup Pomeranian',
+    image: '/puppies/seat-2.jpg',
+    x: '35%',
+    w: '9.2rem',
+    peek: 0.7,
+    tilt: '-2deg',
+    slug: 'korean-teacup-pomeranian'
+  },
+  {
+    name: 'Copper',
+    breed: 'Cavapoo',
+    image: '/puppies/seat-3.jpg',
+    x: '65%',
+    w: '9.4rem',
+    peek: 0.74,
+    tilt: '3deg',
+    slug: 'copper-male'
+  },
+  {
+    name: 'Maltipoo',
+    breed: 'Maltipoo',
+    image: '/puppies/seat-4.jpg',
+    x: '77.5%',
+    w: '10.6rem',
+    peek: 0.82,
+    tilt: '-3deg',
+    slug: 'maltipoo-female'
+  },
+  {
+    name: 'Pomeranian',
+    breed: 'Pomeranian',
+    image: '/puppies/seat-5.jpg',
+    x: '91%',
+    w: '8.4rem',
+    peek: 0.6,
+    tilt: '4deg',
+    slug: 'pomeranian-female'
   }
 ];
 
+/**
+ * HeroSection Component
+ * 
+ * Accurately replicates https://puppy.instabizweb.com/ hero:
+ * 1. Shantell Sans handwritten "every puppy is family" with wavy stroke
+ * 2. Solid single-color Fraunces headline
+ * 3. Primary & ghost tactile pill buttons with responsive shadow hover
+ * 4. Interactive Hero Stage (<div class="tp-hero__stage">) with 6 arched puppy seats,
+ *    hover popup tags, and Teddy the mascot peeking over the quilt in the center.
+ * 5. Scalloped stitched quilt pattern band transitioning into Section 2.
+ */
 export const HeroSection: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Scroll bobbing for peeking mascot
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start']
-  });
-  const mascotBobY = useTransform(scrollYProgress, [0, 0.5], [0, 18]);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   return (
-    <section ref={containerRef} className="relative pt-8 sm:pt-12 pb-0 overflow-hidden bg-cream">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-
+    <section className="relative pt-6 sm:pt-10 pb-0 overflow-hidden bg-cream flex flex-col justify-between min-h-[calc(100vh-5rem)]">
+      {/* Upper Copy & CTAs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
+        
         {/* Handwritten Tagline with Wavy Underline */}
         <div className="inline-flex flex-col items-center select-none mb-3">
-          <span className="font-script text-2xl sm:text-3xl text-terracotta-ink font-bold tracking-wide">
+          <span className="font-scrawl text-2xl sm:text-3xl text-terracotta font-bold tracking-wide">
             every puppy is family
           </span>
-          <svg className="w-48 sm:w-56 h-3 text-honey-deep -mt-1" viewBox="0 0 220 24" fill="none">
+          <svg className="w-48 sm:w-56 h-3 text-honey-deep -mt-0.5" viewBox="0 0 220 24" fill="none">
             <path
               d="M4 14 Q 55 4, 110 14 T 216 14"
-              stroke="currentColor"
-              strokeWidth="3"
+              stroke="#B8502D"
+              strokeWidth="2.5"
               strokeLinecap="round"
             />
           </svg>
         </div>
 
         {/* Display Serif Headline in Solid Single-Color Espresso (#23170F) */}
-        <h1 className="font-display font-extrabold text-4xl sm:text-6xl lg:text-7xl text-espresso tracking-tight leading-[1.08] max-w-2xl mx-auto">
+        <h1 className="font-display font-extrabold text-4xl sm:text-6xl lg:text-7xl text-espresso tracking-tight leading-[1.08] max-w-3xl mx-auto">
           Premium teacup puppies in Dubai
         </h1>
 
         {/* Subheadline in medium-readable sans-serif */}
-        <p className="mt-4 text-base sm:text-md text-espresso-soft max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-4 text-base sm:text-lg text-espresso-soft max-w-2xl mx-auto leading-relaxed">
           Meet your new best friend in our Dubai showroom, or order a rare miniature breed from trusted breeders worldwide.
         </p>
 
-        {/* CTAs */}
+        {/* CTA Buttons with Exact Reference Site Tactile Press Physics */}
         <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-4 select-none">
-          <StickerButton
+          <Link
             to="/puppies"
-            variant="primary"
-            size="lg"
-            icon={<ArrowRight className="w-4 h-4" />}
+            className="btn-primary px-8 py-3.5 text-base sm:text-lg min-w-[14rem]"
           >
             View available puppies
-          </StickerButton>
+          </Link>
 
-          <StickerButton
+          <a
             href={CONTACT_DETAILS.whatsappUrl}
-            isExternal
-            variant="ghost"
-            size="lg"
-            icon={<MessageCircle className="w-4 h-4 text-emerald" />}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ghost px-8 py-3.5 text-base sm:text-lg min-w-[14rem]"
           >
             Enquire on WhatsApp
-          </StickerButton>
+          </a>
         </div>
+      </div>
 
-        {/* Large (~220px) Peeking Poodle Mascot Resting Paws on Stitched Divider */}
-        <div className="relative mt-12 sm:mt-16 z-20 flex justify-center">
+      {/* Hero Stage Section (<div class="tp-hero__stage">) */}
+      <div className="tp-hero__stage relative w-full h-[18rem] sm:h-[22rem] lg:h-[26rem] mt-6 select-none overflow-hidden">
+        
+        {/* Lineup of Seated Puppies */}
+        <ul className="tp-lineup absolute inset-0 z-10 pointer-events-none" aria-label="Some of the puppies in our showroom">
+          {HERO_LINEUP.map((pup, idx) => {
+            const isHovered = hoveredIdx === idx;
+            return (
+              <li
+                key={pup.slug}
+                className="tp-lineup__seat pointer-events-auto absolute"
+                style={{
+                  left: pup.x,
+                  bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 1.5rem)',
+                  width: `clamp(6.5rem, 10vw, ${pup.w})`,
+                  transform: `translateX(-50%) rotate(${pup.tilt})`,
+                  zIndex: isHovered ? 30 : 15
+                }}
+                onMouseEnter={() => setHoveredIdx(idx)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                {/* Floating Breed Name Tag */}
+                <div
+                  className="absolute bottom-[calc(100%+0.6rem)] left-1/2 -translate-x-1/2 transition-all duration-300 pointer-events-none whitespace-nowrap"
+                  style={{
+                    opacity: isHovered ? 1 : 0,
+                    transform: isHovered ? 'translate(-50%, -6px)' : 'translate(-50%, 8px)'
+                  }}
+                >
+                  <span className="font-scrawl text-xs sm:text-sm font-bold bg-[#FFFDF8] text-espresso px-3 py-1 rounded-full border-2 border-espresso-border shadow-sm">
+                    {pup.name}
+                  </span>
+                </div>
+
+                {/* Puppy Portrait Arched Frame */}
+                <Link
+                  to={`/puppies/${pup.slug}`}
+                  className="block rounded-t-full overflow-hidden transition-transform duration-300"
+                  style={{
+                    transform: isHovered ? 'translateY(-14%)' : 'translateY(0%)'
+                  }}
+                >
+                  <div
+                    className="relative w-full aspect-[3/4] rounded-t-full bg-honey-soft border-t-2 border-x-2 border-espresso-border shadow-[inset_0_0_0_4px_#FFFDF8] overflow-hidden"
+                  >
+                    <img
+                      src={pup.image}
+                      alt={`${pup.name} puppy`}
+                      className="w-full h-full object-cover"
+                      loading="eager"
+                    />
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Center Mascot: Teddy Peeking over the Quilt */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 z-20 cursor-pointer pointer-events-auto"
+          style={{
+            bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 1.2rem)'
+          }}
+        >
           <motion.div
-            style={{ y: mascotBobY }}
-            className="w-56 h-36 cursor-pointer select-none"
+            whileHover={{ scale: 1.05 }}
+            className="w-44 sm:w-56 h-36 sm:h-44 flex items-center justify-center"
           >
             <PoodleMascot
-              pose="hero-peek"
+              pose="peek"
               className="w-full h-full"
-              bubbleText="hello! 🐾"
             />
           </motion.div>
         </div>
 
-      </div>
-
-      {/* Scalloped Divider Band ABOVE the Marquee */}
-      <div className="w-full -mt-4 relative z-10">
-        <ScallopedDivider fillColor="#FFFDF8" borderColor="#3A261B" className="h-6 sm:h-8" />
-      </div>
-
-      {/* Continuous Horizontal Auto-Scrolling Marquee of Varied-Height Puppy Arches */}
-      <div className="relative bg-[#FFFDF8] py-8 sm:py-10 overflow-hidden marquee-container select-none">
-        <div className="flex w-max marquee-track animate-marquee hover:[animation-play-state:paused]">
-          {/* Double list for seamless infinite loop */}
-          {[...MARQUEE_PUPPIES, ...MARQUEE_PUPPIES].map((pup, idx) => (
-            <div
-              key={idx}
-              className="shrink-0 px-3 sm:px-4 flex flex-col items-center justify-end"
-            >
-              {/* Arched Photo with organic staggered height */}
-              <div
-                className={`relative w-44 sm:w-52 ${pup.height} rounded-t-full rounded-b-2xl overflow-hidden border-[1.5px] border-espresso-border bg-espresso/5 shadow-sm transition-transform duration-300 hover:scale-105`}
-              >
-                <img
-                  src={pup.image}
-                  alt={pup.breed}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80';
-                  }}
+        {/* The Quilt: Scalloped Stitched Edge Pattern and Diamond Grid Body */}
+        <div
+          className="tp-quilt absolute inset-x-0 bottom-0 z-25 h-[clamp(4.5rem,12vh,8rem)]"
+          style={{
+            background:
+              'repeating-linear-gradient(45deg, transparent 0 46px, rgba(42, 23, 14, 0.08) 46px 48px), repeating-linear-gradient(-45deg, transparent 0 46px, rgba(42, 23, 14, 0.08) 46px 48px), #FBE3B4'
+          }}
+        >
+          {/* Top Scalloped Stitched Quilt Hem SVG */}
+          <svg
+            className="tp-quilt__edge absolute -top-[39px] left-0 w-full h-10 pointer-events-none"
+            width="100%"
+            height="40"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <pattern id="tp-scallop" width="76" height="40" patternUnits="userSpaceOnUse">
+                {/* Quilt Fill Semicircle */}
+                <path d="M0 40V27A38 25 0 0 1 76 27V40Z" fill="#FBE3B4" />
+                {/* Thick Espresso Outline */}
+                <path d="M0 27A38 25 0 0 1 76 27" fill="none" stroke="#2a170e" strokeWidth="3" />
+                {/* Dashed Stitched Inner Line */}
+                <path
+                  d="M11 33A27 19 0 0 1 65 33"
+                  fill="none"
+                  stroke="#2a170e"
+                  strokeWidth="1.6"
+                  strokeDasharray="3.5 5.5"
+                  strokeLinecap="round"
+                  opacity="0.45"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
-              </div>
-
-              {/* Floating Slightly-Rotated Pill Breed Label */}
-              <div
-                className={`-mt-4 z-10 px-3 py-1 rounded-full bg-cream-light border-[1.5px] border-espresso-border shadow-lip-sm ${pup.tilt}`}
-              >
-                <span className="font-sans font-semibold text-xs text-espresso whitespace-nowrap">
-                  {pup.breed}
-                </span>
-              </div>
-            </div>
-          ))}
+              </pattern>
+            </defs>
+            <rect width="100%" height="40" fill="url(#tp-scallop)" />
+          </svg>
         </div>
       </div>
-
-      {/* Warm Cream Diagonal-Diamond Grid Band Transitioning into Section 2 */}
-      <div className="w-full h-12 bg-diamond-grid border-b-[1.5px] border-espresso-border" />
     </section>
   );
 };

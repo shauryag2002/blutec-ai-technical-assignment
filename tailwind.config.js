@@ -60,7 +60,8 @@ export default {
       fontFamily: {
         display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        script: ['Caveat', 'cursive'],
+        script: ['"Shantell Sans"', '"Shantell Sans Fallback"', 'Caveat', 'cursive'],
+        scrawl: ['"Shantell Sans"', '"Shantell Sans Fallback"', 'cursive'],
       },
       boxShadow: {
         // Soft storybook bottom-lip shadows

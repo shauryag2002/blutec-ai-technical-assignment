@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAV_LINKS, CONTACT_DETAILS } from '../../data/navigation';
-import { ScallopedDivider } from '../ui/ScallopedDivider';
 
 /**
  * Navbar Component
@@ -18,22 +17,17 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 w-full z-40 bg-[#FDF6EC] border-b border-espresso-border/10 select-none">
+    <header className="sticky top-0 w-full z-40 bg-[#fffdf8] border-b border-espresso-border/10 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
           {/* Brand Logo & Clean "TeddyPups" Wordmark */}
           <NavLink to="/" className="flex items-center gap-3 group">
-            {/* Mascot Emblem */}
-            <div className="w-10 h-10 rounded-full border-[1.5px] border-espresso-border bg-honey-soft flex items-center justify-center shadow-lip-sm group-hover:scale-105 transition-transform overflow-hidden">
-              <svg viewBox="0 0 64 64" className="w-6 h-6 text-espresso" fill="currentColor">
-                <path d="M32 30.5c-7.6 0-15.6 8.3-15.6 15.5 0 5.4 4.2 8.3 9.2 8.3 2.6 0 4.5-1.1 6.4-1.1s3.8 1.1 6.4 1.1c5 0 9.2-2.9 9.2-8.3 0-7.2-8-15.5-15.6-15.5z" />
-                <circle cx="16" cy="30" r="5" />
-                <circle cx="26" cy="18" r="5" />
-                <circle cx="38" cy="18" r="5" />
-                <circle cx="48" cy="30" r="5" />
-              </svg>
-            </div>
+            <img
+              src="/brand/logo.png"
+              alt="TeddyPups U.A.E."
+              className="w-12 h-12 object-contain transition-transform duration-500 group-hover:rotate-[-8deg]"
+            />
             <span className="font-display font-black text-2xl text-espresso tracking-tight">
               TeddyPups
             </span>
@@ -72,7 +66,7 @@ export const Navbar: React.FC = () => {
               href={CONTACT_DETAILS.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-emerald text-white px-5 py-2.5 rounded-full font-sans font-semibold text-sm border-[1.5px] border-espresso-border shadow-lip-md hover:bg-emerald-hover hover:shadow-lip-lg active:translate-y-[2px] active:shadow-lip-press transition-all"
+              className="btn-whatsapp px-5 py-2.5 text-sm gap-2"
             >
               <MessageCircle className="w-4 h-4 fill-current" />
               <span>WhatsApp us</span>
@@ -128,10 +122,16 @@ export const Navbar: React.FC = () => {
         </div>
       )}
 
-      {/* Subtle Scalloped Edge Band Along Bottom Edge of Sticky Navbar */}
-      <div className="w-full pointer-events-none -mb-3 relative z-10">
-        <ScallopedDivider fillColor="#FDF6EC" borderColor="#3A261B" className="h-3" />
-      </div>
+      {/* Cloud Scalloped Hem Edge with Drop Shadow */}
+      <svg aria-hidden="true" className="tp-header__hem" width="100%" height="14" preserveAspectRatio="none">
+        <defs>
+          <pattern id="tp-hem" width="44" height="14" patternUnits="userSpaceOnUse">
+            <path d="M0 0H44V2A22 11 0 0 1 0 2Z" className="tp-header__hem-fill" />
+            <path d="M0 2A22 11 0 0 0 44 2" className="tp-header__hem-line" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="14" fill="url(#tp-hem)" />
+      </svg>
     </header>
   );
 };

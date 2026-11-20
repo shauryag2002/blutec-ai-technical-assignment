@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { StarryFooter } from './StarryFooter';
 import { RouteTransition } from './RouteTransition';
-import { PawTrail } from '../cursor/PawTrail';
+import { PawTrailCanvas } from '../cursor/PawTrailCanvas';
 import { useRouteTransition } from '../../hooks/useRouteTransition';
 
 /**
@@ -11,7 +11,7 @@ import { useRouteTransition } from '../../hooks/useRouteTransition';
  * 
  * Features:
  * - Sticky Navbar with scalloped bottom edge
- * - Delicate paw-step cursor trail on desktop
+ * - High performance canvas paw-step cursor trail on desktop
  * - RouteTransition curtain on page load/navigation
  * - Routed main view <Outlet />
  * - StarryFooter
@@ -21,8 +21,8 @@ export const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-cream text-espresso selection:bg-honey selection:text-espresso relative">
-      {/* Delicate Paw Step Trail behind pointer */}
-      <PawTrail />
+      {/* Delicate Paw Step Trail canvas behind pointer */}
+      <PawTrailCanvas />
 
       {/* Scalloped Curtain Preloader & Route Transition */}
       <RouteTransition isTransitioning={isTransitioning} />

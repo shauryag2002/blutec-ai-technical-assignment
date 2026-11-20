@@ -59,10 +59,98 @@ body {
   color: var(--color-espresso-soft);
 }
 
-/* Handwritten Script: Caveat */
-.font-script {
-  font-family: 'Caveat', cursive;
+/* Handwritten Script & Scrawl: Shantell Sans */
+.font-script, .font-scrawl {
+  font-family: 'Shantell Sans', 'Shantell Sans Fallback', cursive;
+}
+
+/* Header Hem Cloud Scallop */
+.tp-header__hem {
+  filter: drop-shadow(0 4px 4px rgba(42, 23, 14, 0.08));
+  pointer-events: none;
+  display: block;
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0px;
+}
+.tp-header__hem-fill {
+  fill: #FFFDF8;
+}
+.tp-header__hem-line {
+  fill: none;
+  stroke: rgba(42, 23, 14, 0.14);
+  stroke-width: 1.5px;
+}
+
+/* Reference site tactile buttons with responsive shadow & hover */
+.btn-primary {
+  background-color: #a24a1a;
+  color: #fffdf8;
+  border-radius: 999px;
+  box-shadow: 0 8px 0 -2.4px #2a170e;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.25s, box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-primary:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  box-shadow: 0 11px 0 -2.4px #2a170e;
+}
+.btn-primary:active {
+  transform: translateY(2px) rotate(0deg);
+  box-shadow: 0 3px 0 -2.4px #2a170e;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: #2a170e;
+  border: 2px solid #2a170e;
+  border-radius: 999px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.25s, color 0.25s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-ghost:hover {
+  transform: translateY(-2px) rotate(1deg);
+  background-color: #2a170e;
+  color: #fffdf8;
+}
+.btn-ghost:active {
+  transform: translateY(1px);
+}
+
+.btn-whatsapp {
+  background-color: #1f7a4d;
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 8px 0 -2.4px #2a170e;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.25s, box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-whatsapp:hover {
+  background-color: #16633d;
+  transform: translateY(-2px) rotate(-1deg);
+  box-shadow: 0 11px 0 -2.4px #2a170e;
+}
+.btn-whatsapp:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 -2.4px #2a170e;
 }
 
 @layer components {
