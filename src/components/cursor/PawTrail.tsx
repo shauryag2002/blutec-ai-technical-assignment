@@ -19,7 +19,7 @@ export const PawTrail: React.FC = () => {
         {paws.map((paw) => (
           <motion.div
             key={paw.id}
-            initial={{ opacity: 0.35, scale: 0.9 }}
+            initial={{ opacity: 1, scale: 0.9 }}
             animate={{ opacity: 0, scale: 0.72 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
             onAnimationComplete={() => removePaw(paw.id)}
@@ -28,9 +28,9 @@ export const PawTrail: React.FC = () => {
               left: paw.x,
               top: paw.y,
               transform: `translate(-50%, -50%) rotate(${paw.rotation}deg)`,
-              width: 17,
-              height: 17,
-              color: '#9C7A5B'
+              width: 30,
+              height: 30,
+              color: '#dba78b'
             }}
           >
             {/* Soft, delicate paw print silhouette with NO harsh outline */}

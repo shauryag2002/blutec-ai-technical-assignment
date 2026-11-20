@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 w-full z-40 bg-[#FDF6EC] border-b border-espresso-border/10 select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          
+
           {/* Brand Logo & Clean "TeddyPups" Wordmark */}
           <NavLink to="/" className="flex items-center gap-3 group">
             {/* Mascot Emblem */}
@@ -46,8 +46,7 @@ export const Navbar: React.FC = () => {
                 key={link.href}
                 to={link.href}
                 className={({ isActive }) =>
-                  `relative flex flex-col items-center py-2 text-sm font-sans font-semibold transition-colors ${
-                    isActive ? 'text-terracotta' : 'text-espresso-soft hover:text-terracotta'
+                  `relative flex flex-col items-center py-2 text-sm font-sans font-semibold transition-colors ${isActive ? 'text-terracotta' : 'text-espresso-soft hover:text-terracotta'
                   }`
                 }
               >
@@ -104,10 +103,9 @@ export const Navbar: React.FC = () => {
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between py-2.5 px-4 rounded-xl border-[1.5px] border-espresso-border font-semibold text-sm transition-all ${
-                    isActive
-                      ? 'bg-terracotta text-cream-light shadow-lip-sm'
-                      : 'bg-cream text-espresso hover:bg-honey-soft'
+                  `flex items-center justify-between py-2.5 px-4 rounded-xl border-[1.5px] border-espresso-border font-semibold text-sm transition-all ${isActive
+                    ? 'bg-terracotta text-cream-light shadow-lip-sm'
+                    : 'bg-cream text-espresso hover:bg-honey-soft'
                   }`
                 }
               >

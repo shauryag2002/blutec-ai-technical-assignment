@@ -59,7 +59,7 @@ export const HeroSection: React.FC = () => {
   return (
     <section ref={containerRef} className="relative pt-8 sm:pt-12 pb-0 overflow-hidden bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        
+
         {/* Handwritten Tagline with Wavy Underline */}
         <div className="inline-flex flex-col items-center select-none mb-3">
           <span className="font-script text-2xl sm:text-3xl text-terracotta-ink font-bold tracking-wide">
@@ -76,13 +76,13 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* Display Serif Headline in Solid Single-Color Espresso (#23170F) */}
-        <h1 className="font-display font-extrabold text-4xl sm:text-6xl lg:text-7xl text-espresso tracking-tight leading-[1.08] max-w-4xl mx-auto">
+        <h1 className="font-display font-extrabold text-4xl sm:text-6xl lg:text-7xl text-espresso tracking-tight leading-[1.08] max-w-2xl mx-auto">
           Premium teacup puppies in Dubai
         </h1>
 
         {/* Subheadline in medium-readable sans-serif */}
-        <p className="mt-4 text-base sm:text-lg text-espresso-soft max-w-2xl mx-auto leading-relaxed">
-          Meet your new best friend in our Downtown Dubai showroom, or order a rare miniature breed from trusted breeders worldwide.
+        <p className="mt-4 text-base sm:text-md text-espresso-soft max-w-2xl mx-auto leading-relaxed">
+          Meet your new best friend in our Dubai showroom, or order a rare miniature breed from trusted breeders worldwide.
         </p>
 
         {/* CTAs */}
