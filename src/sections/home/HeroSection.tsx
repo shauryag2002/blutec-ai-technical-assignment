@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 import { CONTACT_DETAILS } from '../../data/navigation';
 
 interface LineupPuppy {
@@ -96,13 +94,13 @@ export const HeroSection: React.FC = () => {
     <section className="relative pt-6 sm:pt-10 pb-0 overflow-hidden bg-cream flex flex-col justify-between min-h-[calc(100vh-5rem)]">
       {/* Upper Copy & CTAs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
-        
+
         {/* Handwritten Tagline with Wavy Underline */}
         <div className="inline-flex flex-col items-center select-none mb-3">
-          <span className="font-scrawl text-2xl sm:text-3xl text-terracotta font-bold tracking-wide">
+          <span className="font-scrawl text-2xl sm:text-3xl text-terracotta font-medium tracking-wide">
             every puppy is family
           </span>
-          <svg className="w-48 sm:w-56 h-3 text-honey-deep -mt-0.5" viewBox="0 0 220 24" fill="none">
+          <svg className="w-48  h-3 text-honey-deep -mt-0.5" viewBox="0 0 220 24" fill="none">
             <path
               d="M4 14 Q 55 4, 110 14 T 216 14"
               stroke="#B8502D"
@@ -144,7 +142,7 @@ export const HeroSection: React.FC = () => {
 
       {/* Hero Stage Section (<div class="tp-hero__stage">) */}
       <div className="tp-hero__stage relative w-full h-[18rem] sm:h-[22rem] lg:h-[26rem] mt-6 select-none overflow-hidden">
-        
+
         {/* Lineup of Seated Puppies */}
         <ul className="tp-lineup absolute inset-0 z-10 pointer-events-none" aria-label="Some of the puppies in our showroom">
           {HERO_LINEUP.map((pup, idx) => {
@@ -155,17 +153,17 @@ export const HeroSection: React.FC = () => {
                 className="tp-lineup__seat pointer-events-auto absolute"
                 style={{
                   left: pup.x,
-                  bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 1.5rem)',
+                  bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 3.5rem)',
                   width: `clamp(6.5rem, 10vw, ${pup.w})`,
                   transform: `translateX(-50%) rotate(${pup.tilt})`,
-                  zIndex: isHovered ? 30 : 15
+                  zIndex: isHovered ? 12 : 8
                 }}
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
               >
                 {/* Floating Breed Name Tag */}
                 <div
-                  className="absolute bottom-[calc(100%+0.6rem)] left-1/2 -translate-x-1/2 transition-all duration-300 pointer-events-none whitespace-nowrap"
+                  className="absolute bottom-[calc(100%+0.6rem)] left-1/2 -translate-x-1/2 transition-all duration-300 pointer-events-none whitespace-nowrap z-30"
                   style={{
                     opacity: isHovered ? 1 : 0,
                     transform: isHovered ? 'translate(-50%, -6px)' : 'translate(-50%, 8px)'
@@ -181,7 +179,7 @@ export const HeroSection: React.FC = () => {
                   to={`/puppies/${pup.slug}`}
                   className="block rounded-t-full overflow-hidden transition-transform duration-300"
                   style={{
-                    transform: isHovered ? 'translateY(-14%)' : 'translateY(0%)'
+                    transform: isHovered ? 'translateY(-12%)' : 'translateY(0%)'
                   }}
                 >
                   <div
@@ -200,27 +198,18 @@ export const HeroSection: React.FC = () => {
           })}
         </ul>
 
-        {/* Center Mascot: Teddy Peeking over the Quilt */}
+        {/* Center Mascot Anchor: Stop 1 for Global Puppy Actor */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 z-20 cursor-pointer pointer-events-auto"
+          id="pup-stop-hero"
+          className="absolute left-1/2 -translate-x-1/2 z-15 w-44 sm:w-56 h-36 sm:h-44 pointer-events-none"
           style={{
-            bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 1.2rem)'
+            bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 0.8rem)'
           }}
-        >
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="w-44 sm:w-56 h-36 sm:h-44 flex items-center justify-center"
-          >
-            <PoodleMascot
-              pose="peek"
-              className="w-full h-full"
-            />
-          </motion.div>
-        </div>
+        />
 
         {/* The Quilt: Scalloped Stitched Edge Pattern and Diamond Grid Body */}
         <div
-          className="tp-quilt absolute inset-x-0 bottom-0 z-25 h-[clamp(4.5rem,12vh,8rem)]"
+          className="tp-quilt absolute inset-x-0 bottom-0 z-20 pointer-events-none h-[clamp(4.5rem,12vh,8rem)]"
           style={{
             background:
               'repeating-linear-gradient(45deg, transparent 0 46px, rgba(42, 23, 14, 0.08) 46px 48px), repeating-linear-gradient(-45deg, transparent 0 46px, rgba(42, 23, 14, 0.08) 46px 48px), #FBE3B4'

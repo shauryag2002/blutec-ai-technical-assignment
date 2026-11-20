@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { NAV_LINKS, CONTACT_DETAILS } from '../../data/navigation';
@@ -6,19 +6,64 @@ import { NAV_LINKS, CONTACT_DETAILS } from '../../data/navigation';
 /**
  * Navbar Component
  * 
- * Upgrades:
- * - Sticky navigation (`sticky top-0 z-40`) across all pages
- * - Clean brand wordmark "TeddyPups" (removed "U.A.E." sub-label)
- * - Refined geometric sans-serif (Plus Jakarta Sans, weight 500-600) for links and CTAs
- * - Emerald green pill button with subtle bottom lip shadow
- * - Scalloped bottom hem edge along the entire width
+ * Replicates reference site behavior:
+ * - Initially at scroll 0, header background is transparent and clouds are hidden.
+ * - On scroll (scrollY > 20), milk background and cloud hem smoothly fade in.
+ * - When scrolling down past hero text (scrollY > 220), header collapses upward (-120%).
+ * - When scrolling up, header smoothly slides back down.
  */
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentY = window.scrollY;
+
+          // Clouds and background fade in after scrolling > 20px
+          setScrolled(currentY > 20);
+
+          // Header collapses upward when scrolling down past ~220px (after hero text)
+          if (Math.abs(currentY - lastY) > 6) {
+            if (currentY > lastY && currentY > 220) {
+              setHidden(true);
+            } else if (currentY < lastY) {
+              setHidden(false);
+            }
+            lastY = currentY;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 w-full z-40 bg-[#fffdf8] border-b border-espresso-border/10 select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header
+      data-scrolled={scrolled ? 'true' : 'false'}
+      data-hidden={hidden ? 'true' : 'false'}
+      className={`fixed top-0 inset-x-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.3,1,0.4,1)] select-none ${
+        hidden ? '-translate-y-[120%]' : 'translate-y-0'
+      }`}
+    >
+      {/* Background fill that fades in when scrolled */}
+      <div
+        className={`absolute inset-0 bg-[#FDF6EC] border-b border-espresso-border/10 transition-opacity duration-350 pointer-events-none ${
+          scrolled ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex items-center justify-between h-20">
 
           {/* Brand Logo & Clean "TeddyPups" Wordmark */}
@@ -40,7 +85,8 @@ export const Navbar: React.FC = () => {
                 key={link.href}
                 to={link.href}
                 className={({ isActive }) =>
-                  `relative flex flex-col items-center py-2 text-sm font-sans font-semibold transition-colors ${isActive ? 'text-terracotta' : 'text-espresso-soft hover:text-terracotta'
+                  `relative flex flex-col items-center py-2 text-sm font-sans font-semibold transition-colors ${
+                    isActive ? 'text-terracotta' : 'text-espresso-soft hover:text-terracotta'
                   }`
                 }
               >
@@ -89,7 +135,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-cream-light border-b border-espresso-border px-6 py-6 shadow-md animate-in slide-in-from-top-2 duration-200">
+        <div className="lg:hidden bg-cream-light border-b border-espresso-border px-6 py-6 shadow-md animate-in slide-in-from-top-2 duration-200 relative z-20">
           <nav className="flex flex-col gap-3 font-sans">
             {NAV_LINKS.map((link) => (
               <NavLink
@@ -97,9 +143,10 @@ export const Navbar: React.FC = () => {
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between py-2.5 px-4 rounded-xl border-[1.5px] border-espresso-border font-semibold text-sm transition-all ${isActive
-                    ? 'bg-terracotta text-cream-light shadow-lip-sm'
-                    : 'bg-cream text-espresso hover:bg-honey-soft'
+                  `flex items-center justify-between py-2.5 px-4 rounded-xl border-[1.5px] border-espresso-border font-semibold text-sm transition-all ${
+                    isActive
+                      ? 'bg-terracotta text-cream-light shadow-lip-sm'
+                      : 'bg-cream text-espresso hover:bg-honey-soft'
                   }`
                 }
               >
@@ -122,8 +169,16 @@ export const Navbar: React.FC = () => {
         </div>
       )}
 
-      {/* Cloud Scalloped Hem Edge with Drop Shadow */}
-      <svg aria-hidden="true" className="tp-header__hem" width="100%" height="14" preserveAspectRatio="none">
+      {/* Cloud Scalloped Hem Edge that fades in when scrolled */}
+      <svg
+        aria-hidden="true"
+        className={`tp-header__hem absolute top-[calc(100%-1px)] left-0 w-full h-3.5 transition-opacity duration-350 pointer-events-none ${
+          scrolled ? 'opacity-100' : 'opacity-0'
+        }`}
+        width="100%"
+        height="14"
+        preserveAspectRatio="none"
+      >
         <defs>
           <pattern id="tp-hem" width="44" height="14" patternUnits="userSpaceOnUse">
             <path d="M0 0H44V2A22 11 0 0 1 0 2Z" className="tp-header__hem-fill" />

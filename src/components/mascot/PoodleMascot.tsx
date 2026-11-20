@@ -110,74 +110,77 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
             />
 
             {/* Walking / Standing Body & Stepping Legs */}
-            <g data-p="body" opacity={isWalking ? 1 : 0}>
-              {/* Back foot (far) */}
-              <motion.g
-                data-p="bf"
-                transform="translate(94 192)"
-                animate={isWalking ? { rotate: [10, -10, 10] } : {}}
-                transition={{ repeat: Infinity, duration: 0.7, ease: 'easeInOut' }}
-                style={{ transformOrigin: '94px 192px' }}
-              >
-                <path d="M-14 -14 C-14 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 14 4 14 -14Z" fill="#e4a352" />
-                <path d="M-14 -14 C-14 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 14 4 14 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-                <path d="M-3.5 29 v5 M4.5 29 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-              </motion.g>
+            <g data-p="body" opacity={isPeeking ? 0 : 1}>
+              {/* Back foot (far) - wrapped in static translate to prevent limb detachment */}
+              <g transform="translate(94, 192)">
+                <motion.g
+                  data-p="bf"
+                  animate={isWalking ? { rotate: [-22, 22, -22] } : { rotate: 0 }}
+                  transition={{ repeat: Infinity, duration: 0.65, ease: 'easeInOut' }}
+                >
+                  <path d="M-14 -14 C-14 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 14 4 14 -14Z" fill="#e4a352" />
+                  <path d="M-14 -14 C-14 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 14 4 14 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                  <path d="M-3.5 29 v5 M4.5 29 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                </motion.g>
+              </g>
 
-              {/* Front foot (far) */}
-              <motion.g
-                data-p="ff"
-                transform="translate(168 192)"
-                animate={isWalking ? { rotate: [-10, 10, -10] } : {}}
-                transition={{ repeat: Infinity, duration: 0.7, ease: 'easeInOut' }}
-                style={{ transformOrigin: '168px 192px' }}
-              >
-                <path d="M-11 -14 C-11 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 11 4 11 -14Z" fill="#e4a352" />
-                <path d="M-11 -14 C-11 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 11 4 11 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-                <path d="M-3.5 29 v5 M4.5 29 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-              </motion.g>
+              {/* Front foot (far) - wrapped in static translate */}
+              <g transform="translate(168, 192)">
+                <motion.g
+                  data-p="ff"
+                  animate={isWalking ? { rotate: [22, -22, 22] } : { rotate: 0 }}
+                  transition={{ repeat: Infinity, duration: 0.65, ease: 'easeInOut' }}
+                >
+                  <path d="M-11 -14 C-11 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 11 4 11 -14Z" fill="#e4a352" />
+                  <path d="M-11 -14 C-11 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 11 4 11 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                  <path d="M-3.5 29 v5 M4.5 29 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                </motion.g>
+              </g>
 
               {/* Fluffy Pom-Pom Tail with Interactive Hover Wiggle */}
-              <motion.g
-                data-p="tail"
-                animate={isHovered ? { rotate: [-28, -10, -28, -10, -20] } : { rotate: -20 }}
-                transition={{ repeat: isHovered ? Infinity : 0, duration: 0.42 }}
-                style={{ transformOrigin: '84px 150px' }}
-              >
-                <path d="M86 152 C80 146 76 140 74 136" stroke="#2a170e" strokeWidth="9" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-                <path d="M86 152 C80 146 76 140 74 136" stroke="#f2be6b" strokeWidth="4" fill="none" strokeLinecap="round" />
-                <path d="M70.0 110.0Q78.1 105.0 80.9 113.7Q90.5 114.8 86.7 123.2Q93.4 129.9 84.7 134.0Q85.2 143.1 75.8 141.0Q70.0 148.3 64.2 141.0Q54.8 143.1 55.3 134.0Q46.6 129.9 53.3 123.2Q49.5 114.8 59.1 113.7Q61.9 105.0 70.0 110.0Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
-              </motion.g>
+              <g transform="translate(84, 150)">
+                <motion.g
+                  data-p="tail"
+                  animate={isHovered ? { rotate: [-28, 14, -28] } : { rotate: [-5, 5, -5] }}
+                  transition={{ repeat: Infinity, duration: isHovered ? 0.35 : 1.2, ease: 'easeInOut' }}
+                >
+                  <path d="M2 2 C-4 -4 -8 -10 -10 -14" stroke="#2a170e" strokeWidth="9" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                  <path d="M2 2 C-4 -4 -8 -10 -10 -14" stroke="#f2be6b" strokeWidth="4" fill="none" strokeLinecap="round" />
+                  <g transform="translate(-84, -150)">
+                    <path d="M70.0 110.0Q78.1 105.0 80.9 113.7Q90.5 114.8 86.7 123.2Q93.4 129.9 84.7 134.0Q85.2 143.1 75.8 141.0Q70.0 148.3 64.2 141.0Q54.8 143.1 55.3 134.0Q46.6 129.9 53.3 123.2Q49.5 114.8 59.1 113.7Q61.9 105.0 70.0 110.0Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
+                  </g>
+                </motion.g>
+              </g>
 
-              {/* Back near leg */}
-              <motion.g
-                data-p="bn"
-                transform="translate(110 194)"
-                animate={isWalking ? { rotate: [-10, 10, -10] } : {}}
-                transition={{ repeat: Infinity, duration: 0.7, ease: 'easeInOut' }}
-                style={{ transformOrigin: '110px 194px' }}
-              >
-                <path d="M-15 -14 C-15 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 15 4 15 -14Z" fill="#f2be6b" />
-                <path d="M-15 -14 C-15 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 15 4 15 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-                <path d="M-3.5 27 v5 M4.5 27 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-              </motion.g>
+              {/* Back near leg - wrapped in static translate */}
+              <g transform="translate(110, 194)">
+                <motion.g
+                  data-p="bn"
+                  animate={isWalking ? { rotate: [22, -22, 22] } : { rotate: 0 }}
+                  transition={{ repeat: Infinity, duration: 0.65, ease: 'easeInOut' }}
+                >
+                  <path d="M-15 -14 C-15 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 15 4 15 -14Z" fill="#f2be6b" />
+                  <path d="M-15 -14 C-15 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 15 4 15 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                  <path d="M-3.5 27 v5 M4.5 27 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                </motion.g>
+              </g>
 
               {/* Main Cloud Fluffy Torso */}
               <path d="M76.8 175.6Q69.0 167.9 78.2 160.7Q76.6 151.8 90.3 147.3Q95.2 138.9 110.9 137.9Q121.6 131.3 136.7 134.0Q151.1 130.5 162.9 136.4Q178.7 136.4 185.3 144.5Q199.7 148.2 199.7 157.1Q210.3 163.7 203.9 171.9Q208.7 180.4 197.0 186.3Q195.3 195.2 180.3 198.0Q172.3 205.7 156.6 204.8Q143.7 210.0 130.0 205.6Q114.5 207.4 105.1 200.2Q89.7 198.3 86.3 189.6Q73.6 184.3 76.8 175.6Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
               <path d="M182.7 196.4Q169.4 196.9 166.6 183.0Q156.1 174.1 162.3 161.5Q159.6 147.6 171.9 142.2Q178.2 129.7 191.0 134.0Q203.3 128.7 210.5 140.8Q223.1 145.2 221.3 159.3Q228.4 171.5 218.5 181.0Q216.6 195.1 203.2 195.7Q193.3 205.1 182.7 196.4Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
 
-              {/* Front near leg */}
-              <motion.g
-                data-p="fn"
-                transform="translate(186 194)"
-                animate={isWalking ? { rotate: [10, -10, 10] } : {}}
-                transition={{ repeat: Infinity, duration: 0.7, ease: 'easeInOut' }}
-                style={{ transformOrigin: '186px 194px' }}
-              >
-                <path d="M-12 -14 C-12 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 12 4 12 -14Z" fill="#f2be6b" />
-                <path d="M-12 -14 C-12 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 12 4 12 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-                <path d="M-3.5 27 v5 M4.5 27 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-              </motion.g>
+              {/* Front near leg - wrapped in static translate */}
+              <g transform="translate(186, 194)">
+                <motion.g
+                  data-p="fn"
+                  animate={isWalking ? { rotate: [-22, 22, -22] } : { rotate: 0 }}
+                  transition={{ repeat: Infinity, duration: 0.65, ease: 'easeInOut' }}
+                >
+                  <path d="M-12 -14 C-12 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 12 4 12 -14Z" fill="#f2be6b" />
+                  <path d="M-12 -14 C-12 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 12 4 12 -14" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                  <path d="M-3.5 27 v5 M4.5 27 v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+                </motion.g>
+              </g>
             </g>
 
             {/* Sitting Haunch (sitting pose) */}

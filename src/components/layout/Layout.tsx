@@ -4,6 +4,7 @@ import { Navbar } from './Navbar';
 import { StarryFooter } from './StarryFooter';
 import { RouteTransition } from './RouteTransition';
 import { PawTrailCanvas } from '../cursor/PawTrailCanvas';
+import { GlobalPuppyActor } from '../mascot/GlobalPuppyActor';
 import { useRouteTransition } from '../../hooks/useRouteTransition';
 
 /**
@@ -23,6 +24,9 @@ export const Layout: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-cream text-espresso selection:bg-honey selection:text-espresso relative">
       {/* Delicate Paw Step Trail canvas behind pointer */}
       <PawTrailCanvas />
+
+      {/* Global Interactive Puppy Actor (Teddy) traveling between sections */}
+      <GlobalPuppyActor />
 
       {/* Scalloped Curtain Preloader & Route Transition */}
       <RouteTransition isTransitioning={isTransitioning} />

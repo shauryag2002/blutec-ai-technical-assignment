@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { PuppyDoorCard } from '../../components/ui/PuppyDoorCard';
 import { StickerButton } from '../../components/ui/StickerButton';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 import { PUPPIES } from '../../data/puppies';
 import type { Puppy } from '../../types/puppy';
 import { useResponsive } from '../../hooks/useMediaQuery';
@@ -77,11 +76,11 @@ export const MeetThePupsSection: React.FC = () => {
 
         {/* DESKTOP HORIZONTAL TRACK WITH WALKING POODLE */}
         {isDesktop ? (
-          <div className="relative flex-1 flex flex-col justify-center overflow-hidden">
+          <div className="relative flex-1 flex flex-col justify-end overflow-hidden">
             {/* Horizontal Track of Puppy Doors */}
             <motion.div
               style={{ x: trackX }}
-              className="flex items-center gap-8 pl-12 pr-28"
+              className="flex items-end gap-8 pl-12 pr-28 pb-0 z-10"
             >
               {featuredPuppies.map((puppy, idx) => (
                 <DesktopDoorWrapper
@@ -93,54 +92,45 @@ export const MeetThePupsSection: React.FC = () => {
               ))}
 
               {/* End Card: Dashed Arch "Meet them all" */}
-              <div className="shrink-0 flex flex-col items-center">
+              <li className="shrink-0 list-none flex flex-col items-center">
                 <Link
                   to="/puppies"
-                  className="w-56 h-80 rounded-t-[100px] rounded-b-xl border-[1.5px] border-dashed border-espresso-border bg-cream-light/75 flex flex-col items-center justify-center p-6 text-center hover:bg-cream-light transition-colors group shadow-card-soft"
+                  className="w-52 sm:w-60 h-[270px] sm:h-[310px] rounded-t-full border-[3px] border-b-0 border-dashed border-[#2a170e] bg-cream-light/85 flex flex-col items-center justify-center p-6 text-center hover:bg-cream-light transition-colors group shadow-card-soft"
                 >
-                  <div className="w-12 h-12 rounded-full border border-espresso-border bg-honey-soft flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-full border-2 border-[#2a170e] bg-honey-soft flex items-center justify-center group-hover:scale-110 transition-transform">
                     <span className="text-xl">🐾</span>
                   </div>
-                  <h3 className="font-display font-bold text-xl text-espresso mt-4">
+                  <h3 className="font-display font-extrabold text-2xl text-espresso mt-4">
                     Meet them all
                   </h3>
-                  <p className="font-sans text-xs text-espresso-soft mt-1">
+                  <p className="font-sans text-xs font-semibold text-espresso-soft mt-1">
                     15 puppies looking for a home
                   </p>
                   <span className="mt-3 text-xs font-sans font-bold text-terracotta underline">
                     View catalogue →
                   </span>
                 </Link>
-              </div>
+              </li>
             </motion.div>
 
-            {/* Wooden Plank Floor along the bottom */}
-            <div className="relative mt-6 w-full h-12 bg-wood border-t-[1.5px] border-espresso-border">
-              {/* Wood Plank Lines */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  backgroundImage: `repeating-linear-gradient(
-                    0deg,
-                    transparent 0,
-                    transparent 14px,
-                    rgba(35, 23, 15, 0.25) 15px,
-                    rgba(35, 23, 15, 0.35) 16px
-                  )`
-                }}
-              />
-
-              {/* Walking Poodle Mascot along the wooden floor */}
+            {/* Authentic Wooden Plank Footpath along the bottom */}
+            <div
+              className="tp-meet__floor relative w-full h-24 sm:h-28 border-t-[3px] border-[#2a170e] z-10"
+              style={{
+                background: `
+                  linear-gradient(to bottom, rgba(42, 23, 14, 0.16), transparent 22%),
+                  repeating-linear-gradient(90deg, transparent 0 calc(11rem - 2px), rgba(42, 23, 14, 0.12) calc(11rem - 2px) 11rem),
+                  linear-gradient(#e8b06a, #dc9a52)
+                `,
+                boxShadow: 'rgb(245, 217, 168) 0px -12px 0px -6px'
+              }}
+            >
+              {/* Moving Stop Anchor for the Global Walking Mascot */}
               <motion.div
+                id="pup-stop-meet"
                 style={{ left: poodleWalkLeft }}
-                className="absolute -top-20 z-20"
-              >
-                <PoodleMascot
-                  pose="side-walk"
-                  className="w-24 h-20"
-                  bubbleText="coming? 🐾"
-                />
-              </motion.div>
+                className="absolute -top-16 w-28 h-24 pointer-events-none"
+              />
             </div>
           </div>
         ) : (
@@ -164,7 +154,7 @@ export const MeetThePupsSection: React.FC = () => {
               <div className="shrink-0 snap-center flex items-center">
                 <Link
                   to="/puppies"
-                  className="w-56 h-80 rounded-t-[100px] rounded-b-xl border-[1.5px] border-dashed border-espresso-border bg-cream-light flex flex-col items-center justify-center p-6 text-center shadow-card-soft"
+                  className="w-52 h-[270px] rounded-t-full border-[3px] border-b-0 border-dashed border-[#2a170e] bg-cream-light flex flex-col items-center justify-center p-6 text-center shadow-card-soft"
                 >
                   <span className="text-2xl">🐾</span>
                   <h3 className="font-display font-bold text-xl text-espresso mt-2">
@@ -178,10 +168,6 @@ export const MeetThePupsSection: React.FC = () => {
                   </span>
                 </Link>
               </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <PoodleMascot pose="sit" className="w-16 h-14" bubbleText="tap a door! ➔" />
             </div>
           </div>
         )}
