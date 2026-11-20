@@ -33,8 +33,8 @@ export const MeetThePupsSection: React.FC = () => {
   });
 
   // Track transform
-  const trackX = useTransform(scrollYProgress, [0, 1], ['0%', '-56%']);
-  const poodleWalkLeft = useTransform(scrollYProgress, [0, 1], ['4%', '88%']);
+  const trackX = useTransform(scrollYProgress, [0, 1], ['0%', '-98%']);
+  const poodleWalkLeft = useTransform(scrollYProgress, [0, 1], ['18%', '82%']);
 
   // Doors swing open as mascot passes (progress slices)
   const door1Open = useTransform(scrollYProgress, [0.05, 0.2], [false, true]);
@@ -49,14 +49,12 @@ export const MeetThePupsSection: React.FC = () => {
   return (
     <section
       ref={targetRef}
-      className={`relative bg-[#FFF1D8] border-b-[1.5px] border-espresso-border ${
-        isDesktop ? 'h-[260vh]' : 'py-16'
-      }`}
+      className={`relative bg-[#FFF1D8] border-b-[1.5px] border-espresso-border ${isDesktop ? 'h-[260vh]' : 'py-16'
+        }`}
     >
       <div
-        className={`${
-          isDesktop ? 'sticky top-20 h-[calc(100vh-5rem)] overflow-hidden flex flex-col justify-between py-8' : ''
-        }`}
+        className={`${isDesktop ? 'sticky top-20 h-[calc(100vh-5rem)] overflow-hidden flex flex-col justify-between pt-8' : ''
+          }`}
       >
         {/* Section Header */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 select-none mb-4">
@@ -80,7 +78,7 @@ export const MeetThePupsSection: React.FC = () => {
             {/* Horizontal Track of Puppy Doors */}
             <motion.div
               style={{ x: trackX }}
-              className="flex items-end gap-8 pl-12 pr-28 pb-0 z-10"
+              className="flex items-end gap-8 pl-[32vw] lg:pl-[35vw] pr-28 pb-0 z-10"
             >
               {featuredPuppies.map((puppy, idx) => (
                 <DesktopDoorWrapper
@@ -92,22 +90,17 @@ export const MeetThePupsSection: React.FC = () => {
               ))}
 
               {/* End Card: Dashed Arch "Meet them all" */}
-              <li className="shrink-0 list-none flex flex-col items-center">
+              <li className="tp-door tp-door--all shrink-0 list-none flex flex-col items-center">
                 <Link
                   to="/puppies"
-                  className="w-52 sm:w-60 h-[270px] sm:h-[310px] rounded-t-full border-[3px] border-b-0 border-dashed border-[#2a170e] bg-cream-light/85 flex flex-col items-center justify-center p-6 text-center hover:bg-cream-light transition-colors group shadow-card-soft"
+                  className="tp-door__link block w-52 sm:w-60 group cursor-pointer"
                 >
-                  <div className="w-12 h-12 rounded-full border-2 border-[#2a170e] bg-honey-soft flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span className="text-xl">🐾</span>
-                  </div>
-                  <h3 className="font-display font-extrabold text-2xl text-espresso mt-4">
-                    Meet them all
-                  </h3>
-                  <p className="font-sans text-xs font-semibold text-espresso-soft mt-1">
-                    15 puppies looking for a home
-                  </p>
-                  <span className="mt-3 text-xs font-sans font-bold text-terracotta underline">
-                    View catalogue →
+                  <span className="tp-door__frame tp-door__frame--all relative aspect-[4/5.2] w-full rounded-t-full border-[3px] border-b-0 border-dashed border-[#2a170e] bg-transparent flex items-center justify-center p-4 transition-colors group-hover:border-terracotta">
+                    <span className="font-display font-extrabold text-3xl sm:text-4xl text-espresso text-center leading-tight">
+                      <span className="underline decoration-terracotta decoration-[3px] underline-offset-4">Meet</span>
+                      <br />
+                      <span className="underline decoration-terracotta decoration-[3px] underline-offset-8">them all</span>
+                    </span>
                   </span>
                 </Link>
               </li>
@@ -154,17 +147,12 @@ export const MeetThePupsSection: React.FC = () => {
               <div className="shrink-0 snap-center flex items-center">
                 <Link
                   to="/puppies"
-                  className="w-52 h-[270px] rounded-t-full border-[3px] border-b-0 border-dashed border-[#2a170e] bg-cream-light flex flex-col items-center justify-center p-6 text-center shadow-card-soft"
+                  className="w-52 aspect-[4/5.2] rounded-t-full border-[3px] border-b-0 border-dashed border-[#2a170e] bg-transparent flex items-center justify-center p-4 transition-colors group"
                 >
-                  <span className="text-2xl">🐾</span>
-                  <h3 className="font-display font-bold text-xl text-espresso mt-2">
-                    Meet them all
-                  </h3>
-                  <p className="font-sans text-xs text-espresso-soft mt-1">
-                    15 available puppies
-                  </p>
-                  <span className="mt-3 text-xs font-sans font-bold text-terracotta">
-                    View catalogue →
+                  <span className="font-display font-extrabold text-3xl text-espresso text-center leading-tight">
+                    <span className="underline decoration-terracotta decoration-[3px] underline-offset-4">Meet</span>
+                    <br />
+                    <span className="underline decoration-terracotta decoration-[3px] underline-offset-8">them all</span>
                   </span>
                 </Link>
               </div>

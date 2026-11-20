@@ -89,9 +89,28 @@ const HERO_LINEUP: LineupPuppy[] = [
  */
 export const HeroSection: React.FC = () => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+
+  // Monitor scroll to collapse cards smoothly down into the quilt
+  React.useEffect(() => {
+    let animId = 0;
+    const handleScroll = () => {
+      cancelAnimationFrame(animId);
+      animId = requestAnimationFrame(() => {
+        // Collapse progress: 0 to 1 as scrollY moves from 30px to 380px
+        const p = Math.min(Math.max((window.scrollY - 30) / 320, 0), 1);
+        setCollapseProgress(p);
+      });
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(animId);
+    };
+  }, []);
 
   return (
-    <section className="relative pt-6 sm:pt-10 pb-0 overflow-hidden bg-cream flex flex-col justify-between min-h-[calc(100vh-5rem)]">
+    <section className="relative pt-28 sm:pt-32 pb-0 overflow-hidden bg-cream flex flex-col justify-between min-h-[calc(100vh-5rem)]">
       {/* Upper Copy & CTAs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
 
@@ -147,6 +166,15 @@ export const HeroSection: React.FC = () => {
         <ul className="tp-lineup absolute inset-0 z-10 pointer-events-none" aria-label="Some of the puppies in our showroom">
           {HERO_LINEUP.map((pup, idx) => {
             const isHovered = hoveredIdx === idx;
+            // Cards sink down behind the quilt as user scrolls past hero
+            const stagger = idx * 0.07;
+            const seatDuck = Math.min(Math.max((collapseProgress - stagger) / 0.65, 0), 1);
+            // Smoothstep curve for organic puppy ducking
+            const easeDuck = seatDuck * seatDuck * (3 - 2 * seatDuck);
+            const translateYPercent = isHovered ? -12 : easeDuck * 115;
+            const scale = 1 - easeDuck * 0.08;
+            const opacity = 1 - easeDuck * 0.5;
+
             return (
               <li
                 key={pup.slug}
@@ -165,7 +193,7 @@ export const HeroSection: React.FC = () => {
                 <div
                   className="absolute bottom-[calc(100%+0.6rem)] left-1/2 -translate-x-1/2 transition-all duration-300 pointer-events-none whitespace-nowrap z-30"
                   style={{
-                    opacity: isHovered ? 1 : 0,
+                    opacity: isHovered && seatDuck < 0.15 ? 1 : 0,
                     transform: isHovered ? 'translate(-50%, -6px)' : 'translate(-50%, 8px)'
                   }}
                 >
@@ -174,12 +202,13 @@ export const HeroSection: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Puppy Portrait Arched Frame */}
+                {/* Puppy Portrait Arched Frame - sinks into quilt on scroll */}
                 <Link
                   to={`/puppies/${pup.slug}`}
-                  className="block rounded-t-full overflow-hidden transition-transform duration-300"
+                  className="block rounded-t-full overflow-hidden transition-all duration-300 ease-out"
                   style={{
-                    transform: isHovered ? 'translateY(-12%)' : 'translateY(0%)'
+                    transform: `translateY(${translateYPercent.toFixed(1)}%) scale(${scale.toFixed(3)})`,
+                    opacity
                   }}
                 >
                   <div

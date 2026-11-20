@@ -25,12 +25,6 @@ export const Layout: React.FC = () => {
       {/* Delicate Paw Step Trail canvas behind pointer */}
       <PawTrailCanvas />
 
-      {/* Global Interactive Puppy Actor (Teddy) traveling between sections */}
-      <GlobalPuppyActor />
-
-      {/* Scalloped Curtain Preloader & Route Transition */}
-      <RouteTransition isTransitioning={isTransitioning} />
-
       {/* Sticky Global Navigation */}
       <Navbar />
 
@@ -38,6 +32,12 @@ export const Layout: React.FC = () => {
       <main id="main" className="flex-grow">
         <Outlet />
       </main>
+
+      {/* Global Interactive Puppy Actor (Teddy) traveling between sections */}
+      <GlobalPuppyActor />
+
+      {/* Scalloped Curtain Preloader & Route Transition */}
+      <RouteTransition isTransitioning={isTransitioning} />
 
       {/* Continuous Starry Night Footer */}
       <StarryFooter />
