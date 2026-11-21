@@ -23,7 +23,6 @@ export const MeetThePupsSection: React.FC = () => {
   const featuredPuppies = PUPPIES.slice(0, 7);
 
   // Controlled open door state for mobile tap
-  const [mobileOpenSlug, setMobileOpenSlug] = useState<string | null>(null);
 
   // Scroll progress for desktop sticky horizontal treadmill walk
   const { scrollYProgress } = useScroll({
@@ -145,9 +144,6 @@ export const MeetThePupsSection: React.FC = () => {
                       puppy={puppy}
                       doorColor={DOOR_WOOD_COLORS[idx % DOOR_WOOD_COLORS.length]}
                       isOpenControlled={true}
-                      onToggleOpen={() =>
-                        setMobileOpenSlug((prev) => (prev === puppy.slug ? null : puppy.slug))
-                      }
                     />
                   ))}
 
