@@ -105,11 +105,11 @@ export const MeetThePupsSection: React.FC = () => {
                   ))}
 
                   {/* End Card: Dashed Arched Door Frame "Meet them all" */}
-                  <li className="tp-door tp-door--all">
+                  <li className="tp-door tp-door--all" data-open="true">
                     <Link to="/puppies" className="tp-door__link block group">
                       <span className="tp-door__frame tp-door__frame--all transition-colors group-hover:border-terracotta">
                         <span className="font-plush tp-door__all">
-                          Meet them all
+                          Meet<br />them all
                         </span>
                       </span>
                     </Link>
@@ -153,11 +153,11 @@ export const MeetThePupsSection: React.FC = () => {
                   ))}
 
                   <div className="shrink-0 snap-center flex items-end">
-                    <li className="tp-door tp-door--all">
+                    <li className="tp-door tp-door--all" data-open="true">
                       <Link to="/puppies" className="tp-door__link block group w-52 aspect-[4/5.2]">
                         <span className="tp-door__frame tp-door__frame--all w-full h-full">
                           <span className="font-plush tp-door__all">
-                            Meet them all
+                            Meet<br />them all
                           </span>
                         </span>
                       </Link>

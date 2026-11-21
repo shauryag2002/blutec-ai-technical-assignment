@@ -15,6 +15,7 @@ export type PoodlePose =
   | 'walk'
   | 'think'
   | 'basket'
+  | 'snug'
   | 'bow';
 
 interface PoodleMascotProps {
@@ -34,7 +35,7 @@ interface PoodleMascotProps {
  * - Soft rosy cheeks (#f9b9a6) and rust collar with heart tag (#a24a1a)
  * - Interactive mouse eye-tracking with spring physics
  * - Hover tail wiggle on the pom-pom tail
- * - Dynamic pose switching: 'peek' / 'hero-peek', 'walk' / 'side-walk', 'sit', 'bow'
+ * - Dynamic pose switching: 'peek', 'walk', 'sit', 'bow', 'snug' / 'basket'
  */
 export const PoodleMascot: React.FC<PoodleMascotProps> = ({
   pose = 'sit',
@@ -52,7 +53,8 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
   const isPeeking = pose === 'peek' || pose === 'hero-peek' || pose === 'signpost-peek';
   const isSitting = pose === 'sit' || pose === 'passport-stand' || pose === 'think';
   const isBowing = pose === 'bow';
-  const isWalking = !isPeeking && !isSitting && !isBowing;
+  const isBasket = pose === 'basket' || pose === 'snug';
+  const isWalking = !isPeeking && !isSitting && !isBowing && !isBasket;
 
   return (
     <div
@@ -108,13 +110,13 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               rx="92"
               ry="7"
               fill="#2a170e"
-              opacity={isPeeking ? 0 : 0.12}
+              opacity={isPeeking || isBasket ? 0 : 0.12}
             />
 
             {/* Walking / Standing Body & Stepping Legs */}
             <g
               data-p="body"
-              opacity={isPeeking ? 0 : 1}
+              opacity={isPeeking || isBasket ? 0 : 1}
               transform={
                 isSitting
                   ? 'translate(0 -2) rotate(-24 196 206)'
@@ -210,7 +212,7 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
             </g>
 
             {/* Sitting Haunch (sitting pose) */}
-            <g data-p="haunch" opacity={isSitting ? 1 : 0}>
+            <g data-p="haunch" opacity={isSitting && !isBasket ? 1 : 0}>
               <path d="M80.0 204.0Q75.1 194.9 85.7 189.9Q88.4 180.2 100.7 181.2Q110.0 174.6 119.3 181.2Q131.6 180.2 134.3 189.9Q144.9 194.9 140.0 204.0Q144.9 213.1 134.3 218.1Q131.6 227.8 119.3 226.8Q110.0 233.4 100.7 226.8Q88.4 227.8 85.7 218.1Q75.1 213.1 80.0 204.0Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
               <path d="M112 214 C126 212 142 214 146 221 C148 226 144 229 136 229 L116 229 C108 229 104 224 106 219 Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
               <path d="M132 222v5M139 222v5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
@@ -224,6 +226,8 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
                   ? 'translate(-62, 5)'
                   : isBowing
                   ? 'translate(14, 30)'
+                  : isBasket
+                  ? 'translate(0 9) rotate(4 212 100)'
                   : 'translate(0, 4)'
               }
             >
@@ -232,8 +236,8 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               <path d="M212 160 C212 156 206 155 206 159.4 C206 163 212 166.6 212 168.4 C212 166.6 218 163 218 159.4 C218 155 212 156 212 160 Z" fill="#fbe3b4" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
 
               {/* Scalloped Fluffy Ears Framing Both Sides */}
-              <path data-p="earL" d="M177.1 78.7Q186.9 70.8 186.6 87.4Q196.0 89.9 189.9 105.5Q195.2 117.3 185.5 126.0Q184.7 142.8 175.2 141.2Q168.7 156.5 162.9 145.3Q153.1 153.2 153.4 136.6Q144.0 134.1 150.1 118.5Q144.8 106.7 154.5 98.0Q155.3 81.2 164.8 82.8Q171.3 67.5 177.1 78.7Z" fill="#e4a352" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" transform="rotate(-6 174 82)" />
-              <path data-p="earR" d="M246.9 78.7Q252.7 67.5 259.2 82.8Q268.7 81.2 269.5 98.0Q279.2 106.7 273.9 118.5Q280.0 134.1 270.6 136.6Q270.9 153.2 261.1 145.3Q255.3 156.5 248.8 141.2Q239.3 142.8 238.5 126.0Q228.8 117.3 234.1 105.5Q228.0 89.9 237.4 87.4Q237.1 70.8 246.9 78.7Z" fill="#e4a352" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" transform="rotate(6 250 82)" />
+              <path data-p="earL" d="M177.1 78.7Q186.9 70.8 186.6 87.4Q196.0 89.9 189.9 105.5Q195.2 117.3 185.5 126.0Q184.7 142.8 175.2 141.2Q168.7 156.5 162.9 145.3Q153.1 153.2 153.4 136.6Q144.0 134.1 150.1 118.5Q144.8 106.7 154.5 98.0Q155.3 81.2 164.8 82.8Q171.3 67.5 177.1 78.7Z" fill="#e4a352" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" transform={isBasket ? 'rotate(3 174 82)' : 'rotate(-6 174 82)'} />
+              <path data-p="earR" d="M246.9 78.7Q252.7 67.5 259.2 82.8Q268.7 81.2 269.5 98.0Q279.2 106.7 273.9 118.5Q280.0 134.1 270.6 136.6Q270.9 153.2 261.1 145.3Q255.3 156.5 248.8 141.2Q239.3 142.8 238.5 126.0Q228.8 117.3 234.1 105.5Q228.0 89.9 237.4 87.4Q237.1 70.8 246.9 78.7Z" fill="#e4a352" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" transform={isBasket ? 'rotate(-3 250 82)' : 'rotate(6 250 82)'} />
 
               {/* Main Cloud Fluffy Head Puff */}
               <path d="M212.0 54.0Q223.4 48.2 231.5 57.5Q244.5 56.1 248.1 67.5Q260.7 70.7 259.1 82.4Q269.4 89.7 263.0 100.0Q269.4 110.3 259.1 117.6Q260.7 129.3 248.1 132.5Q244.5 143.9 231.5 142.5Q223.4 151.8 212.0 146.0Q200.6 151.8 192.5 142.5Q179.5 143.9 175.9 132.5Q163.3 129.3 164.9 117.6Q154.6 110.3 161.0 100.0Q154.6 89.7 164.9 82.4Q163.3 70.7 175.9 67.5Q179.5 56.1 192.5 57.5Q200.6 48.2 212.0 54.0Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
@@ -272,11 +276,15 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               {/* Rounded Dark Nose, Friendly Smile & Tongue */}
               <path d="M204.5 111.5 Q212 107.2 219.5 111.5 Q218.2 118.4 212 120 Q205.8 118.4 204.5 111.5 Z" fill="#2a170e" />
               <path d="M212 120 V124.5 M212 124.5 Q207.2 129.6 202.8 125.2 M212 124.5 Q216.8 129.6 221.2 125.2" stroke="#2a170e" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" fill="none" />
-              <path data-p="tongue" d="M207.6 127.4 Q212 136.6 216.4 127.4 Z" fill="#e98c8c" stroke="#2a170e" strokeWidth="2.2" strokeLinejoin="round" />
+              <path data-p="tongue" d="M207.6 127.4 Q212 136.6 216.4 127.4 Z" fill="#e98c8c" stroke="#2a170e" strokeWidth="2.2" strokeLinejoin="round" opacity={isBasket ? 0 : 1} />
             </g>
 
-            {/* Front Paws Resting on Ledge / Quilt (active in peeking mode) */}
-            <g data-p="ledge" opacity={isPeeking ? 1 : 0} transform="translate(-62, 5)">
+            {/* Front Paws Resting on Ledge / Quilt / Basket rim */}
+            <g
+              data-p="ledge"
+              opacity={isPeeking || isBasket ? 1 : 0}
+              transform={isPeeking ? 'translate(-62, 5)' : isBasket ? 'translate(0, 9)' : undefined}
+            >
               <path d="M175 159 C175 148 181 142 190 142 C199 142 205 148 205 159 Z M219 159 C219 148 225 142 234 142 C243 142 249 148 249 159 Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
               <path d="M186 153 v-4.5 M194 153 v-4.5 M230 153 v-4.5 M238 153 v-4.5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />
             </g>

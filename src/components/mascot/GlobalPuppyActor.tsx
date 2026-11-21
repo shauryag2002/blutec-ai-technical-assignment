@@ -5,16 +5,16 @@ import { PoodleMascot, type PoodlePose } from './PoodleMascot';
  * GlobalPuppyActor Component
  * 
  * 1. Hero Stage (scrollY <= 80px):
- *    - Teddy sits peeking over the quilt in the center.
- *    - No footprints.
+ *    - Teddy peeks over the quilt in Hero.
+ *    - No footprints; footprints container hidden.
  * 2. Moving to Next Section (80px < scrollY < 650px):
- *    - Teddy steps down and walks toward Meet The Pups.
- *    - Stamps authentic puppy footprints along its walking trajectory!
+ *    - Teddy steps down and walks smoothly toward Meet The Pups.
+ *    - Stamps authentic puppy footprints along its exact walking trajectory!
  * 3. Arrived at Footpath (scrollY >= 650px):
- *    - Once Teddy arrives on the footpath of the next section, ALL footprints are removed.
- *    - Sky in Meet The Pups stays completely clean.
- * 4. Scrolling back to Hero:
- *    - All footprints are also removed.
+ *    - Once Teddy arrives on the footpath of the next section, ALL footprints are immediately removed.
+ *    - Footprints container hidden so sky in Meet The Pups stays completely clean.
+ * 4. Fast scroll protection:
+ *    - Immediate container hide (display: 'none') + clear ensures zero ghost footprints.
  */
 export const GlobalPuppyActor: React.FC = () => {
   const [pupState, setPupState] = useState<{
@@ -33,6 +33,7 @@ export const GlobalPuppyActor: React.FC = () => {
   });
 
   const [clickBubble, setClickBubble] = useState<string | undefined>(undefined);
+  const printsContainerRef = useRef<HTMLDivElement>(null);
   const printsPoolRef = useRef<(SVGSVGElement | null)[]>([]);
   const printIndexRef = useRef(0);
   const stepCountRef = useRef(0);
@@ -40,6 +41,9 @@ export const GlobalPuppyActor: React.FC = () => {
 
   const clearAllFootprints = () => {
     lastStepRef.current = null;
+    if (printsContainerRef.current) {
+      printsContainerRef.current.style.display = 'none';
+    }
     printsPoolRef.current.forEach(svg => {
       if (svg) {
         svg.style.opacity = '0';
@@ -92,7 +96,7 @@ export const GlobalPuppyActor: React.FC = () => {
       const meetRect = meetStop.getBoundingClientRect();
 
       // 2. Arrived at next section (Meet The Pups footpath: scrollY >= 650px)
-      // When puppy arrives on footpath, remove all footprints!
+      // When puppy arrives on footpath, remove all footprints and hide layer!
       if (scrollY >= 650) {
         clearAllFootprints();
 
@@ -108,17 +112,25 @@ export const GlobalPuppyActor: React.FC = () => {
       }
 
       // 3. Going to next section: 80px < scrollY < 650px
-      // Puppy walks down and leaves footprints along the trail
+      // Show prints container and stamp footprints along the trail
+      if (printsContainerRef.current) {
+        printsContainerRef.current.style.display = 'block';
+      }
+
       const t = Math.min(Math.max((scrollY - 80) / 520, 0), 1);
       const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
-      const xHero = heroRect.left + heroRect.width / 2 - 150;
-      const yHero = heroRect.top + heroRect.height / 2 - 120;
-      const xMeet = meetRect.left + meetRect.width / 2 - 150;
-      const yMeet = Math.min(meetRect.top + meetRect.height / 2 - 120, window.innerHeight - 130);
+      // Document positions for stable, non-jumping coordinates
+      const heroDocX = heroRect.left + heroRect.width / 2;
+      const heroDocY = heroRect.top + scrollY + heroRect.height / 2;
+      const meetDocX = meetRect.left + meetRect.width / 2;
+      const meetDocY = meetRect.top + scrollY + meetRect.height / 2;
 
-      const currentX = xHero + (xMeet - xHero) * ease;
-      const currentY = yHero + (yMeet - yHero) * ease;
+      const pupDocX = heroDocX + (meetDocX - heroDocX) * ease;
+      const pupDocY = heroDocY + (meetDocY - heroDocY) * ease;
+
+      const currentX = pupDocX - 150;
+      const currentY = pupDocY - scrollY - 120;
       const currentScale = 1.15 + (0.78 - 1.15) * ease;
       const currentPose: PoodlePose = t > 0.12 ? 'side-walk' : 'peek';
 
@@ -133,8 +145,8 @@ export const GlobalPuppyActor: React.FC = () => {
 
       // Stamp footprints while walking between sections
       if (currentPose === 'side-walk') {
-        const footXDoc = currentX + 150 * currentScale;
-        const footYDoc = currentY + scrollY + 215 * currentScale;
+        const footXDoc = pupDocX;
+        const footYDoc = pupDocY + 70 * currentScale;
 
         if (!lastStepRef.current) {
           lastStepRef.current = { x: footXDoc, y: footYDoc };
@@ -165,6 +177,7 @@ export const GlobalPuppyActor: React.FC = () => {
                 svg.style.transform = `translate3d(${(pawX - sz / 2).toFixed(1)}px, ${(pawY - sz / 2).toFixed(1)}px, 0px) rotate(${angle.toFixed(3)}rad)`;
                 svg.style.width = `${sz.toFixed(1)}px`;
                 svg.style.height = `${sz.toFixed(1)}px`;
+                svg.style.opacity = '0.65';
                 svg.animate([
                   { opacity: 0 },
                   { opacity: 0.65, offset: 0.1 },
@@ -203,8 +216,10 @@ export const GlobalPuppyActor: React.FC = () => {
     <>
       {/* Absolute Document Footprints Layer (renders footprints along transition path) */}
       <div
+        ref={printsContainerRef}
         aria-hidden="true"
         className="pup-prints absolute inset-0 pointer-events-none z-25 overflow-clip"
+        style={{ display: 'none' }}
       >
         {Array.from({ length: 36 }).map((_, idx) => (
           <svg

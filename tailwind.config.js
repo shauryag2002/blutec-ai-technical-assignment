@@ -7,6 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
+        milk: '#FFFDF8',
+        cocoa: '#2A170E',
         cream: {
           DEFAULT: '#FDF6EC',
           light: '#FFFDF8',

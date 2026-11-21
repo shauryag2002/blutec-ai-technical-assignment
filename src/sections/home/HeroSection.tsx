@@ -166,14 +166,14 @@ export const HeroSection: React.FC = () => {
         <ul className="tp-lineup absolute inset-0 z-10 pointer-events-none" aria-label="Some of the puppies in our showroom">
           {HERO_LINEUP.map((pup, idx) => {
             const isHovered = hoveredIdx === idx;
-            // Cards sink down behind the quilt as user scrolls past hero
-            const stagger = idx * 0.07;
-            const seatDuck = Math.min(Math.max((collapseProgress - stagger) / 0.65, 0), 1);
+            // Cards sink down completely behind the quilt as user scrolls past hero
+            const stagger = idx * 0.05;
+            const seatDuck = Math.min(Math.max((collapseProgress - stagger) / 0.7, 0), 1);
             // Smoothstep curve for organic puppy ducking
             const easeDuck = seatDuck * seatDuck * (3 - 2 * seatDuck);
-            const translateYPercent = isHovered ? -12 : easeDuck * 115;
-            const scale = 1 - easeDuck * 0.08;
-            const opacity = 1 - easeDuck * 0.5;
+            const translateYPercent = isHovered ? -12 : easeDuck * 190;
+            const scale = 1 - easeDuck * 0.15;
+            const opacity = Math.max(0, 1 - easeDuck * 1.8);
 
             return (
               <li
