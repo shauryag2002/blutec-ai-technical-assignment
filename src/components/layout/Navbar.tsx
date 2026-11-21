@@ -14,8 +14,23 @@ import { NAV_LINKS, CONTACT_DETAILS } from '../../data/navigation';
  */
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+
+  const handleCloseMenu = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setMobileMenuOpen(false);
+      setIsClosing(false);
+    }, 420);
+  };
+
+  const handleOpenMenu = () => {
+    setIsClosing(false);
+    setMobileMenuOpen(true);
+  };
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -119,7 +134,7 @@ export const Navbar: React.FC = () => {
           <div className="flex lg:hidden items-center">
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(true)}
+              onClick={handleOpenMenu}
               className="inline-flex h-10 items-center gap-2 rounded-full border-2 border-cocoa bg-milk px-4 text-[0.95rem] font-semibold lg:hidden shadow-sm text-cocoa"
               aria-haspopup="dialog"
             >
@@ -133,9 +148,10 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* Fullscreen Mobile Menu Dialog matching reference site */}
-      {mobileMenuOpen && (
+      {(mobileMenuOpen || isClosing) && (
         <dialog
           open
+          data-closing={isClosing ? 'true' : undefined}
           aria-label="Site menu"
           className="tp-menu fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none bg-honey p-0 text-cocoa z-50 flex flex-col outline-none"
         >
@@ -144,7 +160,7 @@ export const Navbar: React.FC = () => {
               <span className="font-scrawl text-lg text-cocoa">where to, friend?</span>
               <button
                 type="button"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={handleCloseMenu}
                 className="h-11 rounded-full bg-cocoa px-5 font-semibold text-milk hover:bg-cocoa/90 transition-colors"
               >
                 Close
@@ -156,7 +172,7 @@ export const Navbar: React.FC = () => {
                   <li key={link.href}>
                     <NavLink
                       to={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={handleCloseMenu}
                       className="tp-menu-link font-plush block py-2 text-[clamp(2.4rem,11vw,3.4rem)] text-cocoa hover:text-terracotta transition-colors leading-tight"
                     >
                       <span>{link.label}</span>
@@ -170,8 +186,8 @@ export const Navbar: React.FC = () => {
                 href={CONTACT_DETAILS.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="btn btn-whatsapp w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-[#25D366] text-white font-semibold text-base shadow-sm"
+                onClick={handleCloseMenu}
+                className="btn btn-whatsapp w-full flex items-center justify-center gap-2 py-3.5 rounded-full bg-[#1f7a4d] text-white font-semibold text-base shadow-sm"
               >
                 <MessageCircle className="w-5 h-5 fill-current" />
                 <span>WhatsApp us</span>

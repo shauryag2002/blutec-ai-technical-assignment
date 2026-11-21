@@ -1,77 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CONTACT_DETAILS } from '../../data/navigation';
+import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 interface LineupPuppy {
   name: string;
   breed: string;
   image: string;
-  x: string;
-  w: string;
-  peek: number;
-  tilt: string;
   slug: string;
 }
+
+const HERO_SEATS = [
+  [9, 8.6, 0.62, -5],
+  [22.5, 10.4, 0.8, 3],
+  [35, 9.2, 0.7, -2],
+  [65, 9.4, 0.74, 3],
+  [77.5, 10.6, 0.82, -3],
+  [91, 8.4, 0.6, 4]
+] as const;
 
 const HERO_LINEUP: LineupPuppy[] = [
   {
     name: 'Toy Poodle',
     breed: 'Toy Poodle',
     image: '/puppies/seat-0.jpg',
-    x: '9%',
-    w: '8.6rem',
-    peek: 0.62,
-    tilt: '-5deg',
     slug: 'toy-poodle-male-female'
   },
   {
     name: 'Max',
     breed: 'Maltipoo',
     image: '/puppies/seat-1.webp',
-    x: '22.5%',
-    w: '10.4rem',
-    peek: 0.8,
-    tilt: '3deg',
     slug: 'maltipoo-max-male'
   },
   {
     name: 'Korean Teacup Pomeranian',
     breed: 'Korean Teacup Pomeranian',
     image: '/puppies/seat-2.jpg',
-    x: '35%',
-    w: '9.2rem',
-    peek: 0.7,
-    tilt: '-2deg',
     slug: 'korean-teacup-pomeranian'
   },
   {
     name: 'Copper',
     breed: 'Cavapoo',
     image: '/puppies/seat-3.jpg',
-    x: '65%',
-    w: '9.4rem',
-    peek: 0.74,
-    tilt: '3deg',
     slug: 'copper-male'
   },
   {
     name: 'Maltipoo',
     breed: 'Maltipoo',
     image: '/puppies/seat-4.jpg',
-    x: '77.5%',
-    w: '10.6rem',
-    peek: 0.82,
-    tilt: '-3deg',
     slug: 'maltipoo-female'
   },
   {
     name: 'Pomeranian',
     breed: 'Pomeranian',
     image: '/puppies/seat-5.jpg',
-    x: '91%',
-    w: '8.4rem',
-    peek: 0.6,
-    tilt: '4deg',
     slug: 'pomeranian-female'
   }
 ];
@@ -84,33 +66,110 @@ const HERO_LINEUP: LineupPuppy[] = [
  * 2. Solid single-color Fraunces headline
  * 3. Primary & ghost tactile pill buttons with responsive shadow hover
  * 4. Interactive Hero Stage (<div class="tp-hero__stage">) with 6 arched puppy seats,
- *    hover popup tags, and Teddy the mascot peeking over the quilt in the center.
+ *    hover & auto-popping tags, duck/pop state animations, and Teddy peeking over quilt in center.
  * 5. Scalloped stitched quilt pattern band transitioning into Section 2.
  */
 export const HeroSection: React.FC = () => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [collapseProgress, setCollapseProgress] = useState(0);
+  const [poppedIdx, setPoppedIdx] = useState<number | null>(null);
+  const [cardStates, setCardStates] = useState<Record<number, 'duck' | 'pop' | undefined>>({});
+  const [isHere, setIsHere] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+  const timeoutsRef = useRef<number[]>([]);
 
-  // Monitor scroll to collapse cards smoothly down into the quilt
-  React.useEffect(() => {
-    let animId = 0;
+  // Monitor scroll to update data-here state
+  useEffect(() => {
     const handleScroll = () => {
-      cancelAnimationFrame(animId);
-      animId = requestAnimationFrame(() => {
-        // Collapse progress: 0 to 1 as scrollY moves from 30px to 380px
-        const p = Math.min(Math.max((window.scrollY - 30) / 320, 0), 1);
-        setCollapseProgress(p);
-      });
+      const scrollY = window.scrollY;
+      setIsHere(scrollY < 380);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(animId);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Auto-cycling duck/pop animation matching live site
+  useEffect(() => {
+    let active = true;
+
+    const clearAll = () => {
+      timeoutsRef.current.forEach(clearTimeout);
+      timeoutsRef.current = [];
+    };
+
+    const runPopCycle = () => {
+      if (!active || !isHere || document.hidden) {
+        timeoutsRef.current.push(setTimeout(runPopCycle, 1200));
+        return;
+      }
+
+      // Pick a random card index to duck and pop
+      const randomIndex = Math.floor(Math.random() * HERO_LINEUP.length);
+
+      // 1. Duck card
+      setCardStates(prev => ({ ...prev, [randomIndex]: 'duck' }));
+
+      // 2. Pop up card after 360ms
+      timeoutsRef.current.push(
+        setTimeout(() => {
+          if (!active) return;
+          setCardStates(prev => ({ ...prev, [randomIndex]: 'pop' }));
+          setPoppedIdx(randomIndex);
+
+          // 3. Hide tag tooltip after 1800ms
+          timeoutsRef.current.push(
+            setTimeout(() => {
+              if (!active) return;
+              setPoppedIdx(prev => (prev === randomIndex ? null : prev));
+            }, 1800)
+          );
+
+          // 4. Reset card state after 700ms
+          timeoutsRef.current.push(
+            setTimeout(() => {
+              if (!active) return;
+              setCardStates(prev => ({ ...prev, [randomIndex]: undefined }));
+            }, 700)
+          );
+        }, 360)
+      );
+
+      // Schedule next random pop in 2.2 - 3.2s
+      const delay = 2200 + Math.random() * 1000;
+      timeoutsRef.current.push(setTimeout(runPopCycle, delay));
+    };
+
+    // Initial delay before first pop
+    timeoutsRef.current.push(setTimeout(runPopCycle, 1800));
+
+    return () => {
+      active = false;
+      clearAll();
+    };
+  }, [isHere]);
+
+  const getSeatStyle = (idx: number): React.CSSProperties => {
+    const [x, w, peek, tilt] = HERO_SEATS[idx];
+    return {
+      '--x': `${x}%`,
+      '--w': `${w}rem`,
+      '--peek': peek,
+      '--tilt': `${tilt}deg`,
+      '--i': idx
+    } as React.CSSProperties;
+  };
+
   return (
-    <section className="relative pt-28 sm:pt-32 pb-0 overflow-hidden bg-cream flex flex-col justify-between min-h-[calc(100vh-5rem)]">
+    <section
+      ref={sectionRef}
+      data-pup-scene="true"
+      data-tone="light"
+      data-here={isHere ? 'true' : 'false'}
+      className="tp-scene tp-hero relative pt-24 sm:pt-28 pb-0 overflow-hidden flex flex-col justify-between min-h-[calc(100vh-5rem)]"
+      style={{
+        '--sky-top': '#fffdf8',
+        '--sky-bottom': '#fbe3b4'
+      } as React.CSSProperties}
+    >
       {/* Upper Copy & CTAs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-20">
 
@@ -119,7 +178,7 @@ export const HeroSection: React.FC = () => {
           <span className="font-scrawl text-2xl sm:text-3xl text-terracotta font-medium tracking-wide">
             every puppy is family
           </span>
-          <svg className="w-48  h-3 text-honey-deep -mt-0.5" viewBox="0 0 220 24" fill="none">
+          <svg className="w-48 h-3 text-honey-deep -mt-0.5" viewBox="0 0 220 24" fill="none">
             <path
               d="M4 14 Q 55 4, 110 14 T 216 14"
               stroke="#B8502D"
@@ -134,12 +193,12 @@ export const HeroSection: React.FC = () => {
           Premium teacup puppies in Dubai
         </h1>
 
-        {/* Subheadline in medium-readable sans-serif */}
+        {/* Subheadline */}
         <p className="mt-4 text-base sm:text-lg text-espresso-soft max-w-2xl mx-auto leading-relaxed">
           Meet your new best friend in our Dubai showroom, or order a rare miniature breed from trusted breeders worldwide.
         </p>
 
-        {/* CTA Buttons with Exact Reference Site Tactile Press Physics */}
+        {/* CTA Buttons */}
         <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-4 select-none">
           <Link
             to="/puppies"
@@ -160,71 +219,59 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Hero Stage Section (<div class="tp-hero__stage">) */}
-      <div className="tp-hero__stage relative w-full h-[18rem] sm:h-[22rem] lg:h-[26rem] mt-6 select-none overflow-hidden">
+      <div className="tp-hero__stage select-none">
 
         {/* Lineup of Seated Puppies */}
-        <ul className="tp-lineup absolute inset-0 z-10 pointer-events-none" aria-label="Some of the puppies in our showroom">
-          {HERO_LINEUP.map((pup, idx) => {
-            const isHovered = hoveredIdx === idx;
-            // Cards sink down completely behind the quilt as user scrolls past hero
-            const stagger = idx * 0.05;
-            const seatDuck = Math.min(Math.max((collapseProgress - stagger) / 0.7, 0), 1);
-            // Smoothstep curve for organic puppy ducking
-            const easeDuck = seatDuck * seatDuck * (3 - 2 * seatDuck);
-            const translateYPercent = isHovered ? -12 : easeDuck * 190;
-            const scale = 1 - easeDuck * 0.15;
-            const opacity = Math.max(0, 1 - easeDuck * 1.8);
-
-            return (
-              <li
-                key={pup.slug}
-                className="tp-lineup__seat pointer-events-auto absolute"
-                style={{
-                  left: pup.x,
-                  bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 3.5rem)',
-                  width: `clamp(6.5rem, 10vw, ${pup.w})`,
-                  transform: `translateX(-50%) rotate(${pup.tilt})`,
-                  zIndex: isHovered ? 12 : 8
-                }}
-                onMouseEnter={() => setHoveredIdx(idx)}
-                onMouseLeave={() => setHoveredIdx(null)}
+        <ul className="tp-lineup" aria-label="Some of the puppies in our showroom">
+          {HERO_LINEUP.map((pup, idx) => (
+            <li
+              key={pup.slug}
+              className="tp-lineup__seat"
+              style={getSeatStyle(idx)}
+            >
+              <Link
+                to={`/puppies/${pup.slug}`}
+                className="tp-lineup__pup"
+                data-pup-friend="true"
+                data-state={cardStates[idx]}
+                aria-label={`Meet ${pup.name}, ${pup.breed}`}
+                onPointerEnter={() => setHoveredIdx(idx)}
+                onPointerLeave={() => setHoveredIdx(null)}
+                onFocus={() => setHoveredIdx(idx)}
+                onBlur={() => setHoveredIdx(null)}
               >
-                {/* Floating Breed Name Tag */}
-                <div
-                  className="absolute bottom-[calc(100%+0.6rem)] left-1/2 -translate-x-1/2 transition-all duration-300 pointer-events-none whitespace-nowrap z-30"
-                  style={{
-                    opacity: isHovered && seatDuck < 0.15 ? 1 : 0,
-                    transform: isHovered ? 'translate(-50%, -6px)' : 'translate(-50%, 8px)'
-                  }}
-                >
-                  <span className="font-scrawl text-xs sm:text-sm font-bold bg-[#FFFDF8] text-espresso px-3 py-1 rounded-full border-2 border-espresso-border shadow-sm">
-                    {pup.name}
-                  </span>
-                </div>
+                <span className="tp-lineup__photo">
+                  <img
+                    src={pup.image}
+                    alt={`${pup.name}, ${pup.breed}`}
+                    loading="eager"
+                    className="w-full h-full object-cover"
+                  />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-                {/* Puppy Portrait Arched Frame - sinks into quilt on scroll */}
-                <Link
-                  to={`/puppies/${pup.slug}`}
-                  className="block rounded-t-full overflow-hidden transition-all duration-300 ease-out"
-                  style={{
-                    transform: `translateY(${translateYPercent.toFixed(1)}%) scale(${scale.toFixed(3)})`,
-                    opacity
-                  }}
-                >
-                  <div
-                    className="relative w-full aspect-[3/4] rounded-t-full bg-honey-soft border-t-2 border-x-2 border-espresso-border shadow-[inset_0_0_0_4px_#FFFDF8] overflow-hidden"
-                  >
-                    <img
-                      src={pup.image}
-                      alt={`${pup.name} puppy`}
-                      className="w-full h-full object-cover"
-                      loading="eager"
-                    />
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
+        {/* Lineup Tags List for Smooth Independent Tooltips */}
+        <ul aria-hidden="true" className="tp-lineup tp-lineup--tags">
+          {HERO_LINEUP.map((pup, idx) => (
+            <li
+              key={pup.slug}
+              className="tp-lineup__seat"
+              style={getSeatStyle(idx)}
+            >
+              <span
+                className="tp-lineup__ghost"
+                data-state={cardStates[idx]}
+                data-tag={hoveredIdx === idx || poppedIdx === idx ? 'show' : undefined}
+              >
+                <span className="tp-lineup__name font-scrawl">
+                  {pup.name}
+                </span>
+              </span>
+            </li>
+          ))}
         </ul>
 
         {/* Center Mascot Anchor: Stop 1 for Global Puppy Actor */}
@@ -233,37 +280,28 @@ export const HeroSection: React.FC = () => {
           data-pup-stop="true"
           data-pose="peek"
           data-facing="right"
-          data-act="peekaboo"
+          data-act="hero"
           data-behind="true"
           data-lane="true"
-          className="pup-stop tp-hero__teddy absolute left-1/2 -translate-x-1/2 z-15 w-44 sm:w-56 h-36 sm:h-44 pointer-events-none"
-          style={{
-            bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 0.8rem)'
-          }}
-        />
-
-        {/* The Quilt: Scalloped Stitched Edge Pattern and Diamond Grid Body */}
-        <div
-          className="tp-quilt absolute inset-x-0 bottom-0 z-20 pointer-events-none h-[clamp(4.5rem,12vh,8rem)]"
-          style={{
-            background:
-              'repeating-linear-gradient(45deg, transparent 0 46px, rgba(42, 23, 14, 0.08) 46px 48px), repeating-linear-gradient(-45deg, transparent 0 46px, rgba(42, 23, 14, 0.08) 46px 48px), #FBE3B4'
-          }}
+          className="pup-stop tp-hero__teddy"
         >
-          {/* Top Scalloped Stitched Quilt Hem SVG */}
+          <div className="pup-buddy" data-facing="right" data-live="">
+            <PoodleMascot pose="peek" />
+          </div>
+        </div>
+
+        {/* The Quilt: Scalloped Stitched Edge Pattern */}
+        <div aria-hidden="true" className="tp-quilt">
           <svg
-            className="tp-quilt__edge absolute -top-[39px] left-0 w-full h-10 pointer-events-none"
+            className="tp-quilt__edge"
             width="100%"
             height="40"
             preserveAspectRatio="none"
           >
             <defs>
               <pattern id="tp-scallop" width="76" height="40" patternUnits="userSpaceOnUse">
-                {/* Quilt Fill Semicircle */}
-                <path d="M0 40V27A38 25 0 0 1 76 27V40Z" fill="#FBE3B4" />
-                {/* Thick Espresso Outline */}
+                <path d="M0 40V27A38 25 0 0 1 76 27V40Z" style={{ fill: 'var(--quilt, #fbe3b4)' }} />
                 <path d="M0 27A38 25 0 0 1 76 27" fill="none" stroke="#2a170e" strokeWidth="3" />
-                {/* Dashed Stitched Inner Line */}
                 <path
                   d="M11 33A27 19 0 0 1 65 33"
                   fill="none"

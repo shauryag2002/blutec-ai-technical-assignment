@@ -1,9 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { PoodleMascot, type PoodlePose } from './PoodleMascot';
 
-const STOP_CONFIGS: { id: string; defaultPose: PoodlePose; facing: 'left' | 'right'; act?: string; behind?: boolean }[] = [
-  { id: 'pup-stop-hero', defaultPose: 'peek', facing: 'right', act: 'peekaboo', behind: true },
-  { id: 'pup-stop-meet', defaultPose: 'side-walk', facing: 'right', act: 'treadmill' },
+interface StopConfig {
+  id: string;
+  defaultPose: PoodlePose;
+  facing: 'left' | 'right';
+  act?: string;
+  behind?: boolean;
+}
+
+const STOP_CONFIGS: StopConfig[] = [
+  { id: 'pup-stop-hero', defaultPose: 'peek', facing: 'right', act: 'hero', behind: true },
+  { id: 'pup-stop-meet', defaultPose: 'walk', facing: 'right', act: 'treadmill' },
   { id: 'pup-stop-paths', defaultPose: 'sit', facing: 'right' },
   { id: 'pup-stop-journey', defaultPose: 'sit', facing: 'right' },
   { id: 'pup-stop-trust', defaultPose: 'sit', facing: 'right' },
@@ -14,24 +22,22 @@ const STOP_CONFIGS: { id: string; defaultPose: PoodlePose; facing: 'left' | 'rig
 ];
 
 /**
- * GlobalPuppyActor Component (Single Travelling Actor)
+ * GlobalPuppyActor Component (Single Roaming Actor)
  * 
- * Replicates the PupJourney architecture from https://puppy.instabizweb.com/:
- * 1. Only ONE puppy actor travels continuously between stops across all sections.
- * 2. In Hero Stage (scrollY <= 80px):
- *    - Teddy peeks over the quilt blanket.
+ * Replicates the authentic PupJourney architecture from https://puppy.instabizweb.com/:
+ * 1. ONLY ONE puppy actor travels continuously between stops across all sections.
+ * 2. When html[data-pup] is active, all static placeholder SVGs are hidden.
+ * 3. In Hero Stage (scrollY <= 60px):
+ *    - Teddy peeks over the quilt blanket in the center.
  *    - Footprints layer is hidden and clear.
- * 3. Moving to Next Section (Hero -> Meet The Pups footpath):
- *    - Teddy steps down and walks toward Meet The Pups.
+ * 4. Moving to Next Section (Hero -> Meet The Pups footpath / section-to-section):
+ *    - Teddy walks toward the destination stop.
  *    - Stamps authentic puppy footprints along its exact walking trajectory.
- * 4. Arrived at Next Section (scrollY >= meetArrival):
- *    - Once Teddy lands on the footpath in Meet The Pups, ALL footprints are immediately cleared.
- *    - Footprints layer hidden so sky and cards stay 100% clean.
- * 5. Fast Scroll Protection:
- *    - Instant clear on scroll threshold prevents ghost or stuck footprints.
- * 6. Responsive:
- *    - On desktop: travels through all stops down to the starry night woven basket.
- *    - On mobile: lane-aware edge docking and basket snuggle.
+ * 5. Arrived at Next Section (e.g. landed on footpath in Meet The Pups):
+ *    - Instantly clears all footprints so the section and footpath remain 100% clean.
+ * 6. Mobile Lane Mode:
+ *    - Docks above the sticky bottom WhatsApp bar, peeking from alternating margins
+ *      without obstructing any text, buttons, or cards.
  */
 export const GlobalPuppyActor: React.FC = () => {
   const [pupState, setPupState] = useState<{
@@ -40,13 +46,15 @@ export const GlobalPuppyActor: React.FC = () => {
     y: number;
     scale: number;
     pose: PoodlePose;
+    facing: 'left' | 'right';
     bubbleText?: string;
   }>({
     visible: false,
     x: 0,
     y: 0,
     scale: 1,
-    pose: 'peek'
+    pose: 'peek',
+    facing: 'right'
   });
 
   const [clickBubble, setClickBubble] = useState<string | undefined>(undefined);
@@ -55,6 +63,7 @@ export const GlobalPuppyActor: React.FC = () => {
   const printIndexRef = useRef(0);
   const stepCountRef = useRef(0);
   const lastStepRef = useRef<{ x: number; y: number } | null>(null);
+  const wasTravelingRef = useRef(false);
 
   const clearAllFootprints = () => {
     lastStepRef.current = null;
@@ -73,8 +82,40 @@ export const GlobalPuppyActor: React.FC = () => {
     });
   };
 
+  const stampFootprint = (footDocX: number, footDocY: number, angle: number, scale: number) => {
+    if (printsContainerRef.current) {
+      printsContainerRef.current.style.display = 'block';
+    }
+    const pool = printsPoolRef.current;
+    if (pool.length === 0) return;
+
+    const svg = pool[printIndexRef.current % pool.length];
+    printIndexRef.current++;
+    if (!svg) return;
+
+    const sz = 16 * Math.max(0.75, scale);
+    svg.style.transform = `translate3d(${(footDocX - sz / 2).toFixed(1)}px, ${(footDocY - sz / 2).toFixed(1)}px, 0px) rotate(${angle.toFixed(3)}rad)`;
+    svg.style.width = `${sz.toFixed(1)}px`;
+    svg.style.height = `${sz.toFixed(1)}px`;
+    svg.style.opacity = '0.55';
+
+    try {
+      svg.animate([
+        { opacity: 0 },
+        { opacity: 0.55, offset: 0.1 },
+        { opacity: 0.55, offset: 0.65 },
+        { opacity: 0 }
+      ], {
+        duration: 2600,
+        easing: 'ease-out'
+      });
+    } catch {
+      // fallback
+    }
+  };
+
   const handlePupClick = () => {
-    const quotes = ['woof! 🐾', 'coming? 🐾', 'I like you! ❤️', 'yip! ✨'];
+    const quotes = ['woof! 🐾', 'coming? 🐾', 'I like you! ❤️', 'yip! ✨', 'achoo! 🐶'];
     const q = quotes[Math.floor(Math.random() * quotes.length)];
     setClickBubble(q);
     setTimeout(() => setClickBubble(undefined), 2200);
@@ -87,9 +128,12 @@ export const GlobalPuppyActor: React.FC = () => {
       const scrollY = window.scrollY;
       const isMobile = window.innerWidth < 768;
 
-      // 1. Locate all available stop elements in the DOM
+      // Set global dataset flag to ensure ONLY ONE puppy is visible
+      document.documentElement.dataset.pup = isMobile ? 'lane' : 'live';
+
+      // 1. Locate all stop elements in the DOM
       const activeStops: {
-        config: typeof STOP_CONFIGS[0];
+        config: StopConfig;
         el: HTMLElement;
         docX: number;
         docY: number;
@@ -103,10 +147,10 @@ export const GlobalPuppyActor: React.FC = () => {
           const rect = el.getBoundingClientRect();
           const docX = rect.left + rect.width / 2;
           const docY = rect.top + scrollY + rect.height / 2;
-          const scale = cfg.id === 'pup-stop-hero' ? 1.15 :
+          const scale = cfg.id === 'pup-stop-hero' ? 1.05 :
                         cfg.id === 'pup-stop-meet' ? 0.78 :
                         cfg.id === 'pup-stop-footer' ? 0.85 :
-                        Math.min(1.05, Math.max(0.72, rect.width / 240));
+                        Math.min(1.0, Math.max(0.72, rect.width / 240));
 
           activeStops.push({
             config: cfg,
@@ -127,114 +171,33 @@ export const GlobalPuppyActor: React.FC = () => {
       const heroStop = activeStops.find(s => s.config.id === 'pup-stop-hero');
       const meetStop = activeStops.find(s => s.config.id === 'pup-stop-meet');
 
-      // 2. HERO STAGE (scrollY <= 80px)
-      if (scrollY <= 80 && heroStop) {
+      // 2. HERO STAGE (scrollY <= 60px)
+      if (scrollY <= 60 && heroStop) {
         clearAllFootprints();
+        wasTravelingRef.current = false;
         const heroRect = heroStop.el.getBoundingClientRect();
         setPupState({
           visible: true,
           x: heroRect.left + heroRect.width / 2 - 150,
           y: heroRect.top + heroRect.height / 2 - 120,
-          scale: 1.15,
+          scale: heroStop.scale,
           pose: 'peek',
+          facing: 'right',
           bubbleText: undefined
         });
         return;
       }
 
-      // Calculate arrival scroll for Meet The Pups footpath
-      let meetArrivalScroll = 620;
-      if (meetStop) {
-        const meetDocTop = meetStop.docY - meetStop.rect.height / 2;
-        meetArrivalScroll = Math.max(480, Math.min(750, meetDocTop - window.innerHeight * 0.55));
-      }
-
-      // 3. TRANSITION FROM HERO TO MEET THE PUPS (80px < scrollY < meetArrivalScroll)
-      if (scrollY < meetArrivalScroll && heroStop && meetStop) {
-        if (printsContainerRef.current) {
-          printsContainerRef.current.style.display = 'block';
-        }
-
-        const t = Math.min(Math.max((scrollY - 80) / (meetArrivalScroll - 80), 0), 1);
-        const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-
-        // Curved arc from Quilt down to Footpath
-        const pupDocX = heroStop.docX + (meetStop.docX - heroStop.docX) * ease;
-        const pupDocY = heroStop.docY + (meetStop.docY - heroStop.docY) * ease;
-
-        const currentX = pupDocX - 150;
-        const currentY = pupDocY - scrollY - 120;
-        const currentScale = 1.15 + (meetStop.scale - 1.15) * ease;
-        const currentPose: PoodlePose = t > 0.12 ? 'side-walk' : 'peek';
-
-        setPupState({
-          visible: true,
-          x: currentX,
-          y: currentY,
-          scale: currentScale,
-          pose: currentPose,
-          bubbleText: undefined
-        });
-
-        // Stamp footprints along walking path
-        if (currentPose === 'side-walk') {
-          const footXDoc = pupDocX;
-          const footYDoc = pupDocY + 70 * currentScale;
-
-          if (!lastStepRef.current) {
-            lastStepRef.current = { x: footXDoc, y: footYDoc };
-          } else {
-            const dx = footXDoc - lastStepRef.current.x;
-            const dy = footYDoc - lastStepRef.current.y;
-            const dist = Math.hypot(dx, dy);
-
-            // Stamp every ~28px of travel
-            if (dist >= 28) {
-              stepCountRef.current++;
-              const n = stepCountRef.current % 2;
-              const angle = Math.atan2(dy, dx) + Math.PI / 2;
-
-              // Left/Right foot alternation
-              const normX = -dy / dist;
-              const normY = dx / dist;
-              const sideOffset = (n === 0 ? 1 : -1) * 8 * currentScale;
-              const pawX = footXDoc + normX * sideOffset;
-              const pawY = footYDoc + normY * sideOffset;
-
-              const pool = printsPoolRef.current;
-              if (pool.length > 0) {
-                const svg = pool[printIndexRef.current % pool.length];
-                printIndexRef.current++;
-                if (svg) {
-                  const sz = 16 * Math.max(0.75, currentScale);
-                  svg.style.transform = `translate3d(${(pawX - sz / 2).toFixed(1)}px, ${(pawY - sz / 2).toFixed(1)}px, 0px) rotate(${angle.toFixed(3)}rad)`;
-                  svg.style.width = `${sz.toFixed(1)}px`;
-                  svg.style.height = `${sz.toFixed(1)}px`;
-                  svg.style.opacity = '0.65';
-                  svg.animate([
-                    { opacity: 0 },
-                    { opacity: 0.65, offset: 0.1 },
-                    { opacity: 0.65, offset: 0.75 },
-                    { opacity: 0 }
-                  ], {
-                    duration: 2500,
-                    easing: 'ease-out'
-                  });
-                }
-              }
-
-              lastStepRef.current = { x: footXDoc, y: footYDoc };
-            }
-          }
-        }
-        return;
-      }
-
-      // 4. ARRIVED AT / PAST FOOTPATH: CLEAR ALL FOOTPRINTS
-      clearAllFootprints();
-
-      // On mobile without desktop treadmill pinned track:
+      // 3. MOBILE RESPONSIVE BEHAVIOR
       if (isMobile) {
+        clearAllFootprints();
+        wasTravelingRef.current = false;
+
+        // Sticky bottom WhatsApp bar offset
+        const barEl = document.querySelector('[data-whatsapp-bar="true"]');
+        const barHeight = barEl ? barEl.getBoundingClientRect().height : 60;
+        const bottomLimit = window.innerHeight - barHeight;
+
         // Dock to footer basket when near footer
         const footerStop = activeStops.find(s => s.config.id === 'pup-stop-footer');
         if (footerStop && footerStop.rect.top < window.innerHeight * 0.8) {
@@ -243,20 +206,21 @@ export const GlobalPuppyActor: React.FC = () => {
             visible: true,
             x: rect.left + rect.width / 2 - 150,
             y: rect.top + rect.height / 2 - 120,
-            scale: 0.85,
+            scale: 0.82,
             pose: 'snug',
+            facing: 'right',
             bubbleText: undefined
           });
           return;
         }
 
-        // Side lane edge peeking on mobile matching reference site:
-        // Alternates left and right screen margin so cards and buttons remain unobstructed
-        const sceneIndex = Math.floor(scrollY / (window.innerHeight * 0.75));
+        // Side lane margin peeking matching live site:
+        // Positioned safely above the sticky bottom bar and peeking from screen edges
+        const sceneIndex = Math.floor(scrollY / (window.innerHeight * 0.7));
         const isLeft = sceneIndex % 2 === 0;
-        const peekScale = 0.46;
-        const peekX = isLeft ? -132 : (window.innerWidth - 42);
-        const peekY = window.innerHeight * 0.45;
+        const peekScale = 0.48;
+        const peekX = isLeft ? -130 : (window.innerWidth - 44);
+        const peekY = bottomLimit - 120;
 
         setPupState({
           visible: true,
@@ -264,17 +228,113 @@ export const GlobalPuppyActor: React.FC = () => {
           y: peekY,
           scale: peekScale,
           pose: 'peek',
+          facing: isLeft ? 'right' : 'left',
           bubbleText: undefined
         });
         return;
       }
 
-      // 5. DESKTOP MULTI-STOP TRAVELER (Meet -> Paths -> Journey -> Trust -> Families -> Questions -> CTA -> Footer)
-      // Find the pair of stops that bracket the current scrollY
-      // A stop is "in focus" when its document top is roughly in the viewport center
-      const viewportMidY = scrollY + window.innerHeight * 0.5;
+      // 4. DESKTOP HERO -> MEET THE PUPS TRANSITION WITH AUTHENTIC FOOTPRINTS
+      // Calculate exact scroll range for the walking journey to Meet The Pups footpath
+      let meetArrivalScroll = 780;
+      if (meetStop) {
+        const meetSection = meetStop.el.closest('section');
+        if (meetSection) {
+          const sRect = meetSection.getBoundingClientRect();
+          meetArrivalScroll = sRect.top + scrollY - window.innerHeight * 0.15;
+        }
+      }
 
-      // Find closest stops
+      // Traveling between Hero and Meet The Pups footpath
+      if (scrollY < meetArrivalScroll && heroStop && meetStop) {
+        wasTravelingRef.current = true;
+        const t = Math.min(Math.max((scrollY - 60) / (meetArrivalScroll - 60), 0), 1);
+        // Smoothstep interpolation
+        const ease = t * t * (3 - 2 * t);
+
+        const pupDocX = heroStop.docX + (meetStop.docX - heroStop.docX) * ease;
+        const pupDocY = heroStop.docY + (meetStop.docY - heroStop.docY) * ease;
+
+        const currentX = pupDocX - 150;
+        const currentY = pupDocY - scrollY - 120;
+        const currentScale = heroStop.scale + (meetStop.scale - heroStop.scale) * ease;
+        const currentPose: PoodlePose = t > 0.08 ? 'side-walk' : 'peek';
+
+        setPupState({
+          visible: true,
+          x: currentX,
+          y: currentY,
+          scale: currentScale,
+          pose: currentPose,
+          facing: 'right',
+          bubbleText: undefined
+        });
+
+        // Stamp footprints along the journey
+        if (currentPose === 'side-walk') {
+          const footXDoc = pupDocX;
+          const footYDoc = pupDocY + 68 * currentScale;
+
+          if (!lastStepRef.current) {
+            lastStepRef.current = { x: footXDoc, y: footYDoc };
+          } else {
+            const dx = footXDoc - lastStepRef.current.x;
+            const dy = footYDoc - lastStepRef.current.y;
+            const dist = Math.hypot(dx, dy);
+
+            // Stamp every 28px of travel
+            if (dist >= 28) {
+              stepCountRef.current++;
+              const n = stepCountRef.current % 2;
+              const angle = Math.atan2(dy, dx) + Math.PI / 2;
+
+              // Alternating left/right paws
+              const normX = -dy / dist;
+              const normY = dx / dist;
+              const sideOffset = (n === 0 ? 1 : -1) * 7.5 * currentScale;
+              const pawX = footXDoc + normX * sideOffset;
+              const pawY = footYDoc + normY * sideOffset;
+
+              stampFootprint(pawX, pawY, angle, currentScale);
+              lastStepRef.current = { x: footXDoc, y: footYDoc };
+            }
+          }
+        }
+        return;
+      }
+
+      // 5. ARRIVED ON MEET THE PUPS FOOTPATH: IMMEDIATELY REMOVE FOOTPRINTS!
+      if (wasTravelingRef.current) {
+        clearAllFootprints();
+        wasTravelingRef.current = false;
+      }
+
+      // Check if inside Meet The Pups pinned/treadmill zone
+      if (meetStop) {
+        const meetSection = meetStop.el.closest('section');
+        if (meetSection) {
+          const sRect = meetSection.getBoundingClientRect();
+          // If Meet The Pups is currently active in viewport
+          if (sRect.top <= 100 && sRect.bottom >= window.innerHeight * 0.4) {
+            clearAllFootprints();
+            const rect = meetStop.el.getBoundingClientRect();
+            setPupState({
+              visible: true,
+              x: rect.left + rect.width / 2 - 150,
+              y: rect.top + rect.height / 2 - 120,
+              scale: meetStop.scale,
+              pose: 'walk',
+              facing: 'right',
+              bubbleText: undefined
+            });
+            return;
+          }
+        }
+      }
+
+      // 6. MULTI-STOP DESKTOP TRAVELER FOR SUBSEQUENT SECTIONS
+      // Find active section stop
+      const viewportMidY = scrollY + window.innerHeight * 0.5;
       let currStopIdx = 1; // Start at Meet The Pups
       for (let i = 1; i < activeStops.length; i++) {
         if (activeStops[i].docY <= viewportMidY) {
@@ -288,7 +348,8 @@ export const GlobalPuppyActor: React.FC = () => {
       const toStop = activeStops[currStopIdx + 1];
 
       if (!toStop) {
-        // We are at the final stop (Starry Footer Woven Basket)
+        // Reached Final Stop: Starry Night Woven Basket
+        clearAllFootprints();
         const rect = fromStop.el.getBoundingClientRect();
         setPupState({
           visible: true,
@@ -296,45 +357,82 @@ export const GlobalPuppyActor: React.FC = () => {
           y: rect.top + rect.height / 2 - 120,
           scale: fromStop.scale,
           pose: fromStop.config.defaultPose,
+          facing: fromStop.config.facing,
           bubbleText: undefined
         });
         return;
       }
 
-      // Interpolate between fromStop and toStop
+      // Interpolation between stops
       const dist = Math.max(1, toStop.docY - fromStop.docY);
       const rawT = (viewportMidY - fromStop.docY) / dist;
       const t = Math.min(Math.max(rawT, 0), 1);
-      const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+      const ease = t * t * (3 - 2 * t);
 
-      // Check if holding stationary at a stop
-      const isHoldingFrom = t < 0.15;
-      const isHoldingTo = t > 0.85;
+      // Section Hold Windows: Holding at a stop vs Traveling between stops
+      const isHoldingFrom = t < 0.2;
+      const isHoldingTo = t > 0.8;
 
+      if (isHoldingFrom || isHoldingTo) {
+        // Holding at stop: footprints removed!
+        clearAllFootprints();
+        const stop = isHoldingFrom ? fromStop : toStop;
+        const rect = stop.el.getBoundingClientRect();
+        setPupState({
+          visible: true,
+          x: rect.left + rect.width / 2 - 150,
+          y: rect.top + rect.height / 2 - 120,
+          scale: stop.scale,
+          pose: stop.config.defaultPose,
+          facing: stop.config.facing,
+          bubbleText: undefined
+        });
+        return;
+      }
+
+      // In transit between sections: walk and stamp footprints
       const pupDocX = fromStop.docX + (toStop.docX - fromStop.docX) * ease;
       const pupDocY = fromStop.docY + (toStop.docY - fromStop.docY) * ease;
-
       const currentX = pupDocX - 150;
       const currentY = pupDocY - scrollY - 120;
       const currentScale = fromStop.scale + (toStop.scale - fromStop.scale) * ease;
-
-      let currentPose: PoodlePose;
-      if (isHoldingFrom) {
-        currentPose = fromStop.config.defaultPose;
-      } else if (isHoldingTo) {
-        currentPose = toStop.config.defaultPose;
-      } else {
-        currentPose = 'side-walk';
-      }
+      const facing = toStop.docX >= fromStop.docX ? 'right' : 'left';
 
       setPupState({
         visible: true,
         x: currentX,
         y: currentY,
         scale: currentScale,
-        pose: currentPose,
+        pose: 'side-walk',
+        facing,
         bubbleText: undefined
       });
+
+      // Stamp footprints while traveling to the next section
+      const footXDoc = pupDocX;
+      const footYDoc = pupDocY + 68 * currentScale;
+
+      if (!lastStepRef.current) {
+        lastStepRef.current = { x: footXDoc, y: footYDoc };
+      } else {
+        const dx = footXDoc - lastStepRef.current.x;
+        const dy = footYDoc - lastStepRef.current.y;
+        const stepDist = Math.hypot(dx, dy);
+
+        if (stepDist >= 28) {
+          stepCountRef.current++;
+          const n = stepCountRef.current % 2;
+          const angle = Math.atan2(dy, dx) + Math.PI / 2;
+          const normX = -dy / stepDist;
+          const normY = dx / stepDist;
+          const sideOffset = (n === 0 ? 1 : -1) * 7.5 * currentScale;
+          const pawX = footXDoc + normX * sideOffset;
+          const pawY = footYDoc + normY * sideOffset;
+
+          stampFootprint(pawX, pawY, angle, currentScale);
+          lastStepRef.current = { x: footXDoc, y: footYDoc };
+        }
+      }
     };
 
     const handleScroll = () => {
@@ -355,7 +453,7 @@ export const GlobalPuppyActor: React.FC = () => {
 
   return (
     <>
-      {/* Absolute Document Footprints Layer (renders footprints along Hero -> Meet path) */}
+      {/* Absolute Document Footprints Layer */}
       <div
         ref={printsContainerRef}
         aria-hidden="true"
@@ -375,7 +473,7 @@ export const GlobalPuppyActor: React.FC = () => {
         ))}
       </div>
 
-      {/* Fixed Viewport Mascot Layer */}
+      {/* Viewport Fixed Roaming Mascot Layer */}
       {pupState.visible && (
         <div
           className="pup-layer fixed inset-0 pointer-events-none z-30 overflow-clip"
@@ -392,7 +490,7 @@ export const GlobalPuppyActor: React.FC = () => {
             <div
               className="pup-actor__body"
               style={{
-                transform: `scale(${pupState.scale.toFixed(3)})`,
+                transform: `scale(${pupState.scale.toFixed(3)}) ${pupState.facing === 'left' ? 'scaleX(-1)' : ''}`,
                 transformOrigin: 'center center'
               }}
             >
