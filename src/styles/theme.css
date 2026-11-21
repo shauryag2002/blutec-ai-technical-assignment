@@ -4130,3 +4130,105 @@ body:has(dialog[open]) [data-whatsapp-bar="true"] {
 @keyframes tp-plane-bob { 
   50% { translate: 0px -6px; rotate: -3deg; }
 }
+
+
+/* ============================================================
+   Scroll Reveal Animations: Puppies Sketchbook & Happy Families
+   ============================================================ */
+.tp-sketchbook__title[data-armed]:not([data-revealed]) .tp-sketchbook__underline path {
+  stroke-dashoffset: 1px;
+}
+
+.tp-sketchbook [data-reveal]:not(.tp-sketch) {
+  transition: opacity 0.6s ease, translate 0.7s var(--ease-silk);
+}
+
+.tp-sketchbook [data-reveal][data-armed]:not([data-revealed]):not(.tp-sketch):not(.tp-sketchbook__title) {
+  opacity: 0;
+  translate: 0 1rem;
+}
+
+.tp-sketch__line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s var(--ease-silk) var(--d, 0ms), stroke 0.3s;
+}
+
+.tp-sketch__line--retrace {
+  transition-delay: calc(var(--d, 0ms) + 0.26s), 0s;
+}
+
+.tp-sketch__doodle {
+  transition: scale 0.5s var(--ease-pounce) calc(var(--d, 0ms) + 0.52s), opacity 0.3s calc(var(--d, 0ms) + 0.52s);
+}
+
+.tp-sketch__sticker {
+  transition: scale 0.45s var(--ease-pounce) calc(var(--d, 0ms) + 0.64s), opacity 0.3s calc(var(--d, 0ms) + 0.64s);
+}
+
+.tp-sketch[data-armed]:not([data-revealed]) .tp-sketch__line {
+  stroke-dashoffset: 1px;
+}
+
+.tp-sketch[data-armed]:not([data-revealed]) .tp-sketch__photo {
+  clip-path: circle(0% at 50% 55%);
+}
+
+.tp-sketch[data-armed]:not([data-revealed]) :is(.tp-sketch__doodle, .tp-sketch__sticker) {
+  opacity: 0;
+  scale: 0;
+}
+
+.tp-sketch[data-armed]:not([data-revealed]) .tp-sketch__wash {
+  opacity: 0;
+  scale: 0.85;
+}
+
+/* Happy Families Polaroid Wall Scroll Reveal */
+.tp-memories [data-reveal]:not(.tp-wall__item) {
+  transition: opacity 0.6s ease, translate 0.7s var(--ease-silk);
+}
+
+.tp-memories [data-reveal][data-armed]:not([data-revealed]):not(.tp-wall__item) {
+  opacity: 0;
+  translate: 0 1rem;
+}
+
+.tp-wall__item[data-armed]:not([data-revealed]) .tp-polaroid {
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.92);
+}
+
+.tp-wall__item[data-armed][data-revealed] .tp-polaroid {
+  animation: tp-print-bound 0.62s var(--d, 0ms) backwards;
+}
+
+.tp-wall__item[data-armed][data-revealed] .tp-wall__paw {
+  animation: tp-paw-pat 0.7s calc(var(--d, 0ms) + 0.2s) both;
+}
+
+.tp-wall__item[data-armed]:not([data-revealed]) .tp-tape {
+  opacity: 0;
+  scale: 1.25 0.6;
+}
+
+/* Accessibility: Reduced motion overrides for scroll reveals */
+@media (prefers-reduced-motion: reduce) {
+  .tp-sketch[data-armed]:not([data-revealed]) .tp-sketch__photo {
+    clip-path: circle(75%) !important;
+  }
+  .tp-sketch[data-armed]:not([data-revealed]) .tp-sketch__line,
+  .tp-sketchbook__title[data-armed]:not([data-revealed]) .tp-sketchbook__underline path {
+    stroke-dashoffset: 0 !important;
+  }
+  .tp-sketch[data-armed]:not([data-revealed]) :is(.tp-sketch__doodle, .tp-sketch__sticker, .tp-sketch__wash),
+  .tp-sketchbook [data-reveal][data-armed]:not([data-revealed]),
+  .tp-memories [data-reveal][data-armed]:not([data-revealed]),
+  .tp-wall__item[data-armed]:not([data-revealed]) :is(.tp-polaroid, .tp-tape) {
+    opacity: 1 !important;
+    transform: none !important;
+    translate: none !important;
+    scale: 1 !important;
+    animation: none !important;
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HAPPY_FAMILIES_PHOTOS } from '../data/happyFamiliesData';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export const HappyFamiliesPage: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -7,6 +8,9 @@ export const HappyFamiliesPage: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Native, high-performance scroll reveal observer with reduced motion support
+  useScrollReveal([]);
 
   // Keyboard navigation & body scroll lock for lightbox modal
   useEffect(() => {
@@ -49,8 +53,6 @@ export const HappyFamiliesPage: React.FC = () => {
               <p
                 className="font-scrawl text-lg text-toffee-ink"
                 data-reveal="true"
-                data-armed="true"
-                data-revealed="true"
               >
                 our wall of happy endings
               </p>
@@ -58,8 +60,6 @@ export const HappyFamiliesPage: React.FC = () => {
                 id="families-title"
                 className="font-plush text-giant tp-memories__title"
                 data-reveal="true"
-                data-armed="true"
-                data-revealed="true"
               >
                 Happy families
                 <svg viewBox="0 0 48 44" className="tp-memories__heart" aria-hidden="true">
@@ -76,16 +76,12 @@ export const HappyFamiliesPage: React.FC = () => {
               <p
                 className="text-lede mt-6 max-w-[50ch] text-cocoa-soft"
                 data-reveal="true"
-                data-armed="true"
-                data-revealed="true"
               >
                 Nothing makes us happier than seeing our puppies in loving homes! Here are some beautiful moments shared by our amazing clients after welcoming their furry friends.
               </p>
               <p
                 className="font-scrawl mt-5 text-lg text-toffee-ink"
                 data-reveal="true"
-                data-armed="true"
-                data-revealed="true"
               >
                 64 moments and counting
               </p>
@@ -94,8 +90,6 @@ export const HappyFamiliesPage: React.FC = () => {
             <figure
               className="tp-memories__note"
               data-reveal="true"
-              data-armed="true"
-              data-revealed="true"
             >
               <span
                 aria-hidden="true"
@@ -118,14 +112,12 @@ export const HappyFamiliesPage: React.FC = () => {
                     key={photo.id}
                     className="tp-wall__item"
                     data-reveal="true"
-                    data-armed="true"
-                    data-revealed="true"
                     style={{ '--d': `${photo.delay}ms` } as React.CSSProperties}
                   >
                     <button
                       type="button"
-                      className="tp-wall__print"
-                      aria-label={photo.ariaLabel}
+                      className="tp-wall__print focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-toffee focus-visible:ring-offset-2 rounded-lg"
+                      aria-label={photo.ariaLabel || `View photo: ${photo.caption}`}
                       onClick={() => setActiveIndex(index)}
                     >
                       <span
@@ -143,7 +135,8 @@ export const HappyFamiliesPage: React.FC = () => {
                         <span className="tp-polaroid__photo">
                           <img
                             alt={photo.alt}
-                            loading="lazy"
+                            loading={index < 4 ? 'eager' : 'lazy'}
+                            fetchPriority={index < 2 ? 'high' : 'auto'}
                             width={photo.width}
                             height={photo.height}
                             decoding="async"
@@ -183,20 +176,23 @@ export const HappyFamiliesPage: React.FC = () => {
             {/* Photo viewer modal */}
             {activePhoto && (
               <dialog
-                aria-label="Photo viewer"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Photo viewer: ${activePhoto.caption || 'family'}`}
                 className="fixed inset-0 z-[60] m-0 h-dvh max-h-none w-screen max-w-none bg-cocoa/95 p-0 text-milk backdrop:bg-cocoa/70 flex flex-col"
                 data-lenis-prevent="true"
                 open
               >
                 <div className="flex h-full flex-col">
                   <div className="flex items-center justify-between gap-4 px-4 py-3">
-                    <p className="font-scrawl text-lg">
+                    <p className="font-scrawl text-lg" aria-live="polite">
                       {activePhoto.id} / {HAPPY_FAMILIES_PHOTOS.length}
                       {activePhoto.caption ? ` — ${activePhoto.caption}` : ''}
                     </p>
                     <button
                       type="button"
-                      className="h-11 rounded-full bg-milk px-5 font-semibold text-cocoa transition hover:bg-cream cursor-pointer"
+                      aria-label="Close photo viewer"
+                      className="h-11 rounded-full bg-milk px-5 font-semibold text-cocoa transition hover:bg-cream cursor-pointer focus-visible:ring-2 focus-visible:ring-toffee"
                       onClick={() => setActiveIndex(null)}
                     >
                       Close
@@ -219,7 +215,8 @@ export const HappyFamiliesPage: React.FC = () => {
                   <div className="flex justify-center gap-3 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
                     <button
                       type="button"
-                      className="h-12 rounded-full border-2 border-milk px-6 font-semibold transition hover:bg-milk/10 cursor-pointer"
+                      aria-label="Previous photo"
+                      className="h-12 rounded-full border-2 border-milk px-6 font-semibold transition hover:bg-milk/10 cursor-pointer focus-visible:ring-2 focus-visible:ring-honey"
                       onClick={() =>
                         setActiveIndex((prev) =>
                           prev === null || prev === 0
@@ -232,7 +229,8 @@ export const HappyFamiliesPage: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      className="h-12 rounded-full bg-honey px-6 font-semibold text-cocoa transition hover:bg-honey-dark cursor-pointer"
+                      aria-label="Next photo"
+                      className="h-12 rounded-full bg-honey px-6 font-semibold text-cocoa transition hover:bg-honey-dark cursor-pointer focus-visible:ring-2 focus-visible:ring-toffee"
                       onClick={() =>
                         setActiveIndex((prev) =>
                           prev === null || prev === HAPPY_FAMILIES_PHOTOS.length - 1

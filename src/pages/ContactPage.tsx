@@ -411,20 +411,6 @@ export const ContactPage: React.FC = () => {
               {/* Downtown Dubai Showroom Section */}
               <section aria-labelledby="visit-title" className="tp-shopfront mt-12">
                 {/* Decorative Downtown Dubai skyline silhouette */}
-                <svg
-                  viewBox="0 0 300 120"
-                  className="absolute -bottom-1 right-0 w-3/4 text-toffee/30"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M4 116h292M20 116V78h16v38M44 116V60h18v56M70 116V84h12v32M150 116V36l4-6v-14l3-4 3 4v14l4 6v80M118 116V70l12-8v54M174 116V64l14 8v44M200 116V82h18v34M226 116V56h14v60M248 116V88h22v28"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
 
                 <div className="tp-visit relative p-7 pt-6">
                   <div>

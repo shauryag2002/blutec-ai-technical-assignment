@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PUPPIES } from '../data/puppies';
 import { PoodleMascot } from '../components/mascot/PoodleMascot';
 import { SKETCH_GEOMETRIES, GONE_HOME_PUPPIES } from '../data/sketchbookData';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export const PuppiesPage: React.FC = () => {
   useEffect(() => {
@@ -45,6 +46,9 @@ export const PuppiesPage: React.FC = () => {
 
   const isDefaultFilters = whereFilter === 'all' && breedFilter === 'all' && genderFilter === 'all';
 
+  // Native, high-performance scroll reveal observer with reduced motion support
+  useScrollReveal([filteredPuppies.length, whereFilter, breedFilter, genderFilter]);
+
   return (
     <div data-page="pups" className="tp-page">
       <section aria-labelledby="pups-title" className="tp-sketchbook">
@@ -52,22 +56,22 @@ export const PuppiesPage: React.FC = () => {
           {/* Sketchbook Header */}
           <div className="tp-sketchbook__head">
             <div className="tp-sketchbook__words">
-              <p className="font-scrawl text-lg text-toffee-ink" data-reveal="true" data-armed="true" data-revealed="true">
+              <p className="font-scrawl text-lg text-toffee-ink" data-reveal="true">
                 from Teddy&apos;s sketchbook
               </p>
-              <h1 id="pups-title" className="font-plush text-giant tp-sketchbook__title" data-reveal="true" data-armed="true" data-revealed="true">
+              <h1 id="pups-title" className="font-plush text-giant tp-sketchbook__title" data-reveal="true">
                 Available puppies
                 <svg aria-hidden="true" viewBox="0 0 400 24" preserveAspectRatio="none" className="tp-sketchbook__underline">
                   <path d="M4 15c40-9 70 5 112-2s70-9 112 0 74 8 116-1 38-4 52 1" pathLength="1" />
                 </svg>
               </h1>
-              <p className="tp-sketchbook__lede text-lede mt-6 max-w-[46ch] text-cocoa-soft" data-reveal="true" data-armed="true" data-revealed="true">
+              <p className="tp-sketchbook__lede text-lede mt-6 max-w-[46ch] text-cocoa-soft" data-reveal="true">
                 Every listing shows real photos of the actual puppy. Open a profile to see them all, then ask us about them on WhatsApp.
               </p>
             </div>
 
             {/* Teddy's Self Portrait Mascot Card */}
-            <div className="tp-sketchbook__self" data-reveal="true" data-armed="true" data-revealed="true">
+            <div className="tp-sketchbook__self" data-reveal="true">
               <div className="pup-buddy w-full h-full flex items-center justify-center" data-live="" data-facing="left">
                 <PoodleMascot pose="sit" className="w-full h-full" />
               </div>
@@ -175,17 +179,15 @@ export const PuppiesPage: React.FC = () => {
                   return (
                     <li key={pup.slug} style={{ opacity: 1, transform: 'none' }}>
                       <Link
-                        className="tp-sketch"
+                        className="tp-sketch focus-visible:ring-2 focus-visible:ring-toffee focus-visible:ring-offset-4"
                         data-reveal="true"
                         aria-label={`${pup.name}, ${pup.breed}, ${pup.gender}, ${pup.age}, available`}
                         to={`/puppies/${pup.slug}`}
                         style={{
                           '--tilt': geom.tilt,
                           '--wash': geom.washColor,
-                          '--d': `${idx * 40}ms`
+                          '--d': `${(idx % 6) * 70}ms`
                         } as React.CSSProperties}
-                        data-armed="true"
-                        data-revealed="true"
                       >
                         <span className="tp-sketch__frame">
                           {/* Organic Watercolor Wash Background */}
@@ -207,9 +209,12 @@ export const PuppiesPage: React.FC = () => {
                           >
                             <img
                               alt=""
-                              loading="lazy"
+                              loading={idx < 2 ? 'eager' : 'lazy'}
+                              fetchPriority={idx === 0 ? 'high' : 'auto'}
                               decoding="async"
                               src={pup.image}
+                              width={300}
+                              height={300}
                               style={{
                                 position: 'absolute',
                                 height: '100%',
@@ -269,7 +274,7 @@ export const PuppiesPage: React.FC = () => {
       {/* Already Gone Home Strip Section */}
       <section aria-labelledby="gone-title" className="tp-gone-strip">
         <div className="gutter mx-auto flex max-w-[110rem] flex-col gap-10 md:flex-row md:items-center">
-          <div className="md:w-1/3" data-reveal="true" data-armed="true" data-revealed="true">
+          <div className="md:w-1/3" data-reveal="true">
             <h2 id="gone-title" className="font-plush text-big">
               Already gone home
             </h2>
@@ -280,20 +285,18 @@ export const PuppiesPage: React.FC = () => {
           </div>
 
           <ul className="tp-gone-strip__row" aria-label="Some puppies who have gone home">
-            {GONE_HOME_PUPPIES.map((gp) => (
+            {GONE_HOME_PUPPIES.map((gp, gIdx) => (
               <li key={gp.slug}>
                 <Link
-                  className="tp-sketch tp-sketch--small"
+                  className="tp-sketch tp-sketch--small focus-visible:ring-2 focus-visible:ring-toffee"
                   data-reveal="true"
                   aria-label={gp.ariaLabel || `${gp.name}, gone home`}
                   to={`/puppies/${gp.slug}`}
                   style={{
                     '--tilt': gp.tilt,
                     '--wash': gp.washColor,
-                    '--d': gp.delay
+                    '--d': `${gIdx * 70}ms`
                   } as React.CSSProperties}
-                  data-armed="true"
-                  data-revealed="true"
                 >
                   <span className="tp-sketch__frame">
                     {gp.washPath && (
