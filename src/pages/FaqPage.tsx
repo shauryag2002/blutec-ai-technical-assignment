@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useId } from "react";
+import { SEO } from "../components/common/SEO";
 
 interface FaqNote {
   id: string;
@@ -116,6 +117,11 @@ export const FaqPage: React.FC = () => {
 
   return (
     <div data-page="faq" className="tp-page">
+      <SEO
+        title="Questions & answers | TeddyPups U.A.E."
+        description="Answers about TeddyPups puppies: health checks and vaccinations, meeting local puppies, imported teacup breeds and delivery."
+        canonical="https://puppy.instabizweb.com/faq"
+      />
       {/* Schema.org FAQPage Microdata */}
       <script
         type="application/ld+json"

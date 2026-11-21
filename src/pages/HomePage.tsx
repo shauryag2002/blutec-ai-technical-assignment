@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SEO } from '../components/common/SEO';
 import { HeroSection } from '../sections/home/HeroSection';
 import { MeetThePupsSection } from '../sections/home/MeetThePupsSection';
 import { TwoWaysSection } from '../sections/home/TwoWaysSection';
@@ -28,6 +29,11 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="w-full">
+      <SEO
+        title="TeddyPups U.A.E. — Premium teacup puppies in Dubai"
+        description="Teddy bear and teacup puppies in Dubai. Meet local puppies in our Downtown Dubai showroom or bring home a rare breed imported from trusted breeders."
+        canonical="https://puppy.instabizweb.com"
+      />
       {/* 1. Hero */}
       <HeroSection />
 

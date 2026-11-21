@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { SEO } from '../components/common/SEO';
 import { PUPPIES } from '../data/puppies';
 import { PoodleMascot } from '../components/mascot/PoodleMascot';
 import { SKETCH_GEOMETRIES, GONE_HOME_PUPPIES } from '../data/sketchbookData';
@@ -51,6 +52,11 @@ export const PuppiesPage: React.FC = () => {
 
   return (
     <div data-page="pups" className="tp-page">
+      <SEO
+        title="Available puppies | TeddyPups U.A.E."
+        description="Teacup and teddy bear puppies available now in Dubai and imported from trusted breeders — every listing shows real photos of the puppy."
+        canonical="https://puppy.instabizweb.com/puppies"
+      />
       <section aria-labelledby="pups-title" className="tp-sketchbook">
         <div className="gutter mx-auto max-w-[110rem] pb-24 pt-10 md:pt-16">
           {/* Sketchbook Header */}

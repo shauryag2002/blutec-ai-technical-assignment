@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { SEO } from '../components/common/SEO';
 import { PUPPIES } from '../data/puppies';
 import { PoodleMascot } from '../components/mascot/PoodleMascot';
 
@@ -79,8 +80,22 @@ export const PuppyDetailPage: React.FC = () => {
     setIsSubmitted(true);
   };
 
+  const isCustomName = Boolean(puppy.name && puppy.name.trim().toLowerCase() !== puppy.breed.trim().toLowerCase());
+  const pageTitle = isCustomName
+    ? `${puppy.name}, ${puppy.breed} puppy | TeddyPups U.A.E.`
+    : `${puppy.breed} puppy (${puppy.gender}) | TeddyPups U.A.E.`;
+  const pageDescription = isCustomName
+    ? `Meet ${puppy.name}: ${puppy.breed}, ${puppy.gender}, ${puppy.age} old, imported. Real photos${puppy.hasVideo ? ' and video' : ''} from TeddyPups U.A.E.`
+    : `Meet this ${puppy.breed}: ${puppy.breed}, ${puppy.gender}, ${puppy.age} old, imported. Real photos${puppy.hasVideo ? ' and video' : ''} from TeddyPups U.A.E.`;
+
   return (
     <div data-page="pup" className="tp-page">
+      <SEO
+        title={pageTitle}
+        description={pageDescription}
+        canonical={`https://puppy.instabizweb.com/puppies/${puppy.slug}`}
+        ogImage={puppy.image}
+      />
       <article
         className="tp-storybook"
         style={{

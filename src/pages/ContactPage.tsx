@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { SEO } from '../components/common/SEO';
 import { PoodleMascot } from '../components/mascot/PoodleMascot';
 
 interface ContactPuppyOption {
@@ -120,6 +121,11 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div data-page="contact" className="tp-page">
+      <SEO
+        title="Visit & contact | TeddyPups U.A.E."
+        description="Visit TeddyPups in Downtown Dubai or get in touch on WhatsApp, by phone or email."
+        canonical="https://puppy.instabizweb.com/contact"
+      />
       <section
         data-pup-scene="true"
         data-tone="light"

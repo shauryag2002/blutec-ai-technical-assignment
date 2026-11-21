@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { SEO } from "../components/common/SEO";
 
 export const HowItWorksPage: React.FC = () => {
   useEffect(() => {
@@ -10,6 +11,11 @@ export const HowItWorksPage: React.FC = () => {
 
   return (
     <div data-page="how" className="tp-page">
+      <SEO
+        title="How it works | TeddyPups U.A.E."
+        description="Meet a local puppy in our Downtown Dubai showroom or reserve a premium teacup breed imported for you — every step, from choosing to coming home."
+        canonical="https://puppy.instabizweb.com/how-it-works"
+      />
       <section
         data-pup-scene="true"
         data-tone="light"

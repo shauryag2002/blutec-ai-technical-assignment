@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SEO } from '../components/common/SEO';
 import { HAPPY_FAMILIES_PHOTOS } from '../data/happyFamiliesData';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
@@ -44,6 +45,11 @@ export const HappyFamiliesPage: React.FC = () => {
 
   return (
     <div data-page="families" className="tp-page">
+      <SEO
+        title="Happy families | TeddyPups U.A.E."
+        description="Real photos shared by TeddyPups families after welcoming their new puppy home."
+        canonical="https://puppy.instabizweb.com/happy-families"
+      />
       <section aria-labelledby="families-title" className="tp-memories">
         <div className="gutter mx-auto max-w-[110rem] pb-24 pt-10 md:pt-16">
           

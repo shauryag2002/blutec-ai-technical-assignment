@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SEO } from '../components/common/SEO';
 import { BoardingPassCard } from '../components/ui/BoardingPassCard';
 import { GONE_HOME_PUPPIES } from '../data/goneHome';
 
@@ -9,6 +10,11 @@ export const GoneHomePage: React.FC = () => {
 
   return (
     <div className="py-12 sm:py-16 bg-cream min-h-screen">
+      <SEO
+        title="Gone home | TeddyPups U.A.E."
+        description="TeddyPups puppies who have already joined their families."
+        canonical="https://puppy.instabizweb.com/gone-home"
+      />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
