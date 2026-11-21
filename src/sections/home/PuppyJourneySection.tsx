@@ -1,229 +1,335 @@
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { StickerButton } from '../../components/ui/StickerButton';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { PoodleMascot } from '../../components/mascot/PoodleMascot';
-import { useScrollStep } from '../../hooks/useScrollStep';
 
 const STEPS = [
   {
     num: 1,
     title: 'Choose your breed',
-    text: "Select your preferred breed or tell us what you're looking for. We'll guide you based on availability and your lifestyle.",
-    botReply: "Welcome to TeddyPups! 🐾 Which breed has your heart today?",
-    pills: ['Maltipoo', 'Pomeranian', 'Poodle', 'Cavapoo', 'Shih Tzu']
+    text: "Select your preferred breed or tell us what you're looking for. We'll guide you based on availability and your lifestyle."
   },
   {
     num: 2,
     title: 'Get photos & details',
-    text: "Our team will share real photos, health details, and all necessary information directly on WhatsApp.",
-    botReply: "Here are current video clips and verified health certificates for your favorite pups! 📹",
-    pills: ['Watch video', 'View vet passport', 'Showroom visit']
+    text: 'Our team will share real photos, health details, and all necessary information directly on WhatsApp.'
   },
   {
     num: 3,
     title: 'Secure & safe delivery',
-    text: "Once confirmed, we handle everything professionally and ensure your puppy reaches you safely and stress-free.",
-    botReply: "Everything is set! Safe air-conditioned delivery is booked to your doorstep. ❤️",
-    pills: ['Confirm delivery', 'Meet at showroom']
+    text: 'Once confirmed, we handle everything professionally and ensure your puppy reaches you safely and stress-free.'
   }
 ];
 
 export const PuppyJourneySection: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { activeStep, setActiveStep } = useScrollStep(containerRef, 3);
-  const [selectedBreed, setSelectedBreed] = useState<string>('Maltipoo');
+  const [activeStep, setActiveStep] = useState<number>(0);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const currentStepData = STEPS[activeStep - 1] || STEPS[0];
+  const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
+  const [mascotBubble, setMascotBubble] = useState<string | undefined>(undefined);
 
-  // Animate online -> typing... -> message on step change
-  React.useEffect(() => {
-    const startTimer = setTimeout(() => {
-      setIsTyping(true);
-    }, 0);
-    const stopTimer = setTimeout(() => {
+  const stepsRef = useRef<HTMLOListElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const prevStepRef = useRef<number>(-1);
+
+  // Scroll detection via IntersectionObserver matching reference site
+  useEffect(() => {
+    if (!stepsRef.current) return;
+    const items = Array.from(stepsRef.current.children);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const idx = items.indexOf(entry.target);
+            if (idx !== -1) {
+              setActiveStep(idx);
+            }
+          }
+        }
+      },
+      { rootMargin: '-28% 0px -62% 0px' }
+    );
+
+    items.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, []);
+
+  // Mascot commentary and typing effect when stepping through
+  useEffect(() => {
+    if (activeStep === prevStepRef.current) return;
+    prevStepRef.current = activeStep;
+
+    setIsTyping(true);
+    const timer = setTimeout(() => {
       setIsTyping(false);
+      if (activeStep === 1) {
+        setMascotBubble('ooh, photos! 📸');
+      } else if (activeStep === 2) {
+        setMascotBubble('home soon! ❤️');
+      } else {
+        setMascotBubble(undefined);
+      }
     }, 700);
 
-    return () => {
-      clearTimeout(startTimer);
-      clearTimeout(stopTimer);
-    };
+    return () => clearTimeout(timer);
   }, [activeStep]);
 
+  // Video play/pause toggle
+  const toggleVideo = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    if (vid.paused) {
+      vid.play().then(() => setIsVideoPlaying(true)).catch(() => { });
+    } else {
+      vid.pause();
+      setIsVideoPlaying(false);
+    }
+  };
+
   return (
-    <section
-      id="puppy-journey"
-      ref={containerRef}
-      className="relative py-20 sm:py-28 bg-[#FFFDF8] border-b-[1.5px] border-espresso-border overflow-hidden"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
-          {/* Left Column: Clean Editorial Numbered Steps on Cream Background (NO Heavy Boxes) */}
-          <div className="lg:col-span-6">
-            <h2 className="font-display font-extrabold text-3xl sm:text-5xl text-espresso tracking-tight">
+    <div data-section="journey">
+      <section
+        data-pup-scene="true"
+        data-tone="light"
+        className="tp-scene tp-chat"
+        style={{
+          '--sky-top': '#f7d18d',
+          '--sky-bottom': '#f0b866'
+        } as React.CSSProperties}
+        aria-labelledby="journey-title"
+        data-here="false"
+        data-visited="true"
+      >
+        <div className="tp-chat__grid gutter" data-pin-range="true">
+          {/* Left Column: Editorial Journey Steps */}
+          <div className="tp-chat__story">
+            <h2 id="journey-title" className="font-plush text-8xl">
               Your puppy journey
             </h2>
-            <p className="mt-3 font-sans text-base sm:text-lg text-espresso-soft max-w-xl leading-relaxed">
+            <p className="text-lede mt-5 max-w-[42ch] text-[var(--ink-soft)]">
               A premium, step-by-step concierge experience. We make adoption simple, secure, and purely joyful.
             </p>
 
-            {/* Clean Numbered Steps */}
-            <ol className="mt-10 space-y-7">
-              {STEPS.map((step) => {
-                const isActive = activeStep === step.num;
-                return (
-                  <li
-                    key={step.num}
-                    onClick={() => setActiveStep(step.num)}
-                    className="flex items-start gap-4 cursor-pointer select-none group"
-                  >
-                    {/* Step Number Circle */}
-                    <div
-                      className={`w-9 h-9 rounded-full border-[1.5px] border-espresso-border flex items-center justify-center font-display font-bold text-sm shrink-0 transition-colors ${
-                        isActive
-                          ? 'bg-terracotta text-cream-light shadow-lip-sm'
-                          : 'bg-honey-soft text-espresso group-hover:bg-honey'
-                      }`}
-                    >
-                      {step.num}
-                    </div>
-
-                    <div className="pt-0.5">
-                      <h3
-                        className={`font-display font-bold text-xl transition-colors ${
-                          isActive ? 'text-espresso' : 'text-espresso/70 group-hover:text-espresso'
-                        }`}
-                      >
-                        {step.title}
-                      </h3>
-                      <p className="mt-1 font-sans text-sm sm:text-base text-espresso-soft leading-relaxed max-w-md">
-                        {step.text}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
+            <ol ref={stepsRef} className="tp-chat__steps">
+              {STEPS.map((step, idx) => (
+                <li
+                  key={step.num}
+                  className="tp-chat__step"
+                  data-active={idx === activeStep ? 'true' : undefined}
+                  data-done={idx < activeStep ? 'true' : undefined}
+                  onClick={() => setActiveStep(idx)}
+                >
+                  <span className="tp-chat__num font-plush" aria-hidden="true">
+                    {step.num}
+                  </span>
+                  <h3 className="font-plush tp-chat__title">{step.title}</h3>
+                  <p className="tp-chat__text">{step.text}</p>
+                </li>
+              ))}
             </ol>
 
-            <div className="mt-9">
-              <StickerButton
-                to="/how-it-works"
-                variant="ghost"
-                size="md"
-                icon={<ArrowRight className="w-4 h-4" />}
-              >
-                How it works
-              </StickerButton>
-            </div>
+            <Link className="btn btn-ghost tp-chat__cta  px-7 py-3 text-base font-semibold shrink-0" to="/how-it-works">
+              How it works
+            </Link>
           </div>
 
-          {/* Center Mascot: Walking Down Steps Beside Smartphone */}
-          <div className="hidden lg:flex lg:col-span-1 justify-center items-center">
-            <PoodleMascot
-              pose={activeStep === 3 ? 'sit' : 'side-walk'}
-              className="w-24 h-20"
-              bubbleText={activeStep === 3 ? 'all set! ❤️' : 'step ' + activeStep}
-            />
-          </div>
-
-          {/* Right Column: Tilted Smartphone Mockup */}
-          <div className="lg:col-span-5 flex justify-center">
-            <motion.div
-              animate={{ rotate: [-1, 1, -1] }}
-              transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut' }}
-              className="relative w-76 sm:w-84 rounded-[38px] border-[3px] border-espresso-border bg-[#23170F] p-2.5 shadow-xl select-none"
+          {/* Right Column: Sticky WhatsApp Smartphone Mockup */}
+          <div className="tp-chat__side">
+            <div
+              className="tp-phone"
+              aria-label="A WhatsApp conversation with TeddyPups U.A.E."
+              role="group"
             >
-              {/* Phone Speaker Notch */}
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-18 h-3.5 bg-[#23170F] rounded-full z-20 flex items-center justify-center">
-                <div className="w-6 h-1 bg-white/20 rounded-full" />
+              {/* WhatsApp Header Bar */}
+              <div className="tp-phone__bar">
+                <img
+                  alt="TeddyPups Logo"
+                  loading="lazy"
+                  width="40"
+                  height="40"
+                  decoding="async"
+                  className="tp-phone__avatar"
+                  src="/brand/logo.png"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      'https://puppy.instabizweb.com/_next/image?url=%2Fbrand%2Flogo.png&w=96&q=75';
+                  }}
+                />
+                <span>
+                  <span className="tp-phone__name">TeddyPups U.A.E.</span>
+                  <span className="tp-phone__status">
+                    {isTyping ? 'typing...' : 'online'}
+                  </span>
+                </span>
               </div>
 
-              {/* Phone Screen */}
-              <div className="relative rounded-[30px] overflow-hidden bg-[#F2F5F8] h-[490px] flex flex-col justify-between border border-espresso/20">
-                
-                {/* Header (WhatsApp Style) */}
-                <div className="bg-[#1E7F4F] text-white p-3.5 pt-6 flex items-center gap-3 shadow-xs z-10">
-                  <div className="w-8 h-8 rounded-full border border-white/40 bg-honey-soft flex items-center justify-center text-espresso font-bold text-xs">
-                    TP
-                  </div>
-                  <div>
-                    <h4 className="font-sans font-bold text-xs tracking-tight">TeddyPups Concierge</h4>
-                    <p className="font-sans text-[10px] text-white/80 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse" />
-                      <span>{isTyping ? 'typing...' : 'online'}</span>
+              {/* Chat Message Screen */}
+              <div className="tp-phone__screen">
+                {/* Outgoing Initial Customer Inquiry */}
+                <p className="tp-msg tp-msg--me">
+                  Hi TeddyPups! I'd love to know more about your puppies.
+                </p>
+
+                {/* Step 0: Breed Chips */}
+                <div
+                  className="tp-msg-group"
+                  data-step="0"
+                  data-show={activeStep >= 0 ? 'true' : 'false'}
+                >
+                  <div className="tp-msg tp-msg--them">
+                    <p>
+                      Select your preferred breed or tell us what you're looking for. We'll guide you based on availability and your lifestyle.
                     </p>
+                    <ul className="tp-chips" aria-label="Breeds we have now">
+                      <li><Link to="/puppies?breed=maltipoo">Maltipoo</Link></li>
+                      <li><Link to="/puppies?breed=pomeranian">Pomeranian</Link></li>
+                      <li><Link to="/puppies?breed=poodle">Poodle</Link></li>
+                      <li><Link to="/puppies?breed=cavapoo">Cavapoo</Link></li>
+                      <li><Link to="/puppies?breed=shih-tzu">Shih Tzu</Link></li>
+                    </ul>
                   </div>
                 </div>
 
-                {/* Chat Message Stream */}
-                <div className="p-3.5 flex-1 overflow-y-auto space-y-2.5 font-sans text-xs flex flex-col justify-end">
-                  
-                  {/* Incoming Bot Message */}
-                  <div className="self-start max-w-[85%] bg-white border border-espresso/10 p-2.5 rounded-2xl rounded-tl-xs shadow-xs">
-                    <p className="text-espresso leading-relaxed">
-                      {isTyping ? '...' : currentStepData.botReply}
-                    </p>
-                    <span className="block text-[8px] text-espresso/40 text-right mt-0.5">10:42 AM</span>
-                  </div>
-
-                  {/* Outgoing User Selection Message */}
-                  <AnimatePresence mode="wait">
-                    {!isTyping && (
-                      <motion.div
-                        key={selectedBreed + activeStep}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="self-end max-w-[85%] bg-[#D7F8E4] border border-[#1E7F4F]/25 p-2.5 rounded-2xl rounded-tr-xs shadow-xs"
-                      >
-                        <p className="text-espresso font-medium">
-                          I'm interested in the adorable {selectedBreed}! 🧸
-                        </p>
-                        <span className="block text-[8px] text-espresso/50 text-right mt-0.5">10:43 AM ✓✓</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Clean Breed Reply Pills (No "QUICK BREED SELECT:" Header) */}
-                  <div className="pt-1.5">
-                    <div className="flex flex-wrap gap-1.5">
-                      {currentStepData.pills.map((pill) => (
-                        <button
-                          key={pill}
-                          type="button"
-                          onClick={() => setSelectedBreed(pill)}
-                          className={`px-2.5 py-1 rounded-full text-[11px] font-sans font-semibold border transition-colors ${
-                            selectedBreed === pill
-                              ? 'bg-terracotta text-white border-espresso-border shadow-xs'
-                              : 'bg-white text-espresso border-espresso/20 hover:border-espresso'
-                          }`}
-                        >
-                          {pill}
-                        </button>
-                      ))}
+                {/* Step 1: Photos Snaps & Video Clip */}
+                <div
+                  className="tp-msg-group"
+                  data-step="1"
+                  data-show={activeStep >= 1 ? 'true' : 'false'}
+                >
+                  <div className="tp-msg tp-msg--them tp-msg--media">
+                    <div className="tp-snaps">
+                      <span className="tp-snaps__one">
+                        <img
+                          alt="Showroom apricot puppy"
+                          loading="lazy"
+                          decoding="async"
+                          src="/puppies/showroom-window.jpg"
+                          className="w-full h-full object-cover"
+                        />
+                      </span>
+                      <span className="tp-snaps__one">
+                        <img
+                          alt="Puppy close up"
+                          loading="lazy"
+                          decoding="async"
+                          src="/puppies/snap-1.jpg"
+                          className="w-full h-full object-cover"
+                        />
+                      </span>
+                      <span className="tp-snaps__one">
+                        <img
+                          alt="Puppy looking up"
+                          loading="lazy"
+                          decoding="async"
+                          src="/puppies/snap-2.jpg"
+                          className="w-full h-full object-cover"
+                        />
+                      </span>
+                      <span className="tp-snaps__one">
+                        <img
+                          alt="Puppy held up"
+                          loading="lazy"
+                          decoding="async"
+                          src="/puppies/snap-3.jpg"
+                          className="w-full h-full object-cover"
+                        />
+                      </span>
                     </div>
                   </div>
+
+                  <div className="tp-msg tp-msg--them tp-msg--media">
+                    <div className="tp-clip">
+                      <video
+                        ref={videoRef}
+                        src="/puppies/journey-clip.mp4"
+                        poster="/puppies/showroom-window.jpg"
+                        muted
+                        loop
+                        playsInline
+                        preload="none"
+                        aria-label="Video of a tiny apricot teddy bear puppy in the TeddyPups showroom"
+                        onEnded={() => setIsVideoPlaying(false)}
+                      />
+                      <button
+                        type="button"
+                        className="tp-clip__play"
+                        onClick={toggleVideo}
+                        aria-pressed={isVideoPlaying}
+                        aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          {isVideoPlaying ? (
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                          ) : (
+                            <path d="M8 5v14l11-7z" />
+                          )}
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="tp-msg tp-msg--them">
+                    Our team will share real photos, health details, and all necessary information directly on WhatsApp.
+                  </p>
                 </div>
 
-                {/* Bottom Input Bar */}
-                <div className="p-2.5 bg-white border-t border-espresso/10 flex items-center gap-2">
-                  <div className="flex-1 bg-[#F2F5F8] px-3 py-1 rounded-full text-[11px] text-espresso/50 font-sans">
-                    Type a message...
-                  </div>
-                  <div className="w-6 h-6 rounded-full bg-[#1E7F4F] flex items-center justify-center text-white text-xs">
-                    ➔
+                {/* Step 2: Route & Safe Delivery */}
+                <div
+                  className="tp-msg-group"
+                  data-step="2"
+                  data-show={activeStep >= 2 ? 'true' : 'false'}
+                >
+                  <div className="tp-msg tp-msg--them">
+                    <p>
+                      Once confirmed, we handle everything professionally and ensure your puppy reaches you safely and stress-free.
+                    </p>
+                    <svg viewBox="0 0 220 70" className="tp-route" aria-hidden="true">
+                      <path d="M14 52 C 60 6, 120 70, 170 28" className="tp-route__line" />
+                      <circle cx="14" cy="52" r="5" className="tp-route__dot" />
+                      <path d="M164 32 l12 -12 l12 12 v14 h-24 z" className="tp-route__home" />
+                      <path d="M176 42 c-2-3-7-2-6 2c1 3 6 5 6 5s5-2 6-5c1-4-4-5-6-2z" className="tp-route__heart" />
+                      <path
+                        d="M32 30.5c-7.6 0-15.6 8.3-15.6 15.5 0 5.4 4.2 8.3 9.2 8.3 2.6 0 4.5-1.1 6.4-1.1s3.8 1.1 6.4 1.1c5 0 9.2-2.9 9.2-8.3 0-7.2-8-15.5-15.6-15.5zM19.28 26.71C21.07 30.08 20.42 33.92 17.84 35.29C15.25 36.67 11.71 35.05 9.92 31.69C8.13 28.32 8.78 24.48 11.36 23.11C13.95 21.73 17.49 23.35 19.28 26.71ZM29.62 15.64C30.32 19.62 28.46 23.26 25.47 23.79C22.48 24.32 19.48 21.53 18.78 17.56C18.08 13.58 19.94 9.94 22.93 9.41C25.92 8.88 28.92 11.67 29.62 15.64ZM45.22 17.56C44.52 21.53 41.52 24.32 38.53 23.79C35.54 23.26 33.68 19.62 34.38 15.64C35.08 11.67 38.08 8.88 41.07 9.41C44.06 9.94 45.92 13.58 45.22 17.56ZM54.08 31.69C52.29 35.05 48.75 36.67 46.16 35.29C43.58 33.92 42.93 30.08 44.72 26.71C46.51 23.35 50.05 21.73 52.64 23.11C55.22 24.48 55.87 28.32 54.08 31.69Z"
+                        transform="translate(70 22) scale(.3) rotate(70 32 32)"
+                        className="tp-route__paw"
+                      />
+                      <path
+                        d="M32 30.5c-7.6 0-15.6 8.3-15.6 15.5 0 5.4 4.2 8.3 9.2 8.3 2.6 0 4.5-1.1 6.4-1.1s3.8 1.1 6.4 1.1c5 0 9.2-2.9 9.2-8.3 0-7.2-8-15.5-15.6-15.5zM19.28 26.71C21.07 30.08 20.42 33.92 17.84 35.29C15.25 36.67 11.71 35.05 9.92 31.69C8.13 28.32 8.78 24.48 11.36 23.11C13.95 21.73 17.49 23.35 19.28 26.71ZM29.62 15.64C30.32 19.62 28.46 23.26 25.47 23.79C22.48 24.32 19.48 21.53 18.78 17.56C18.08 13.58 19.94 9.94 22.93 9.41C25.92 8.88 28.92 11.67 29.62 15.64ZM45.22 17.56C44.52 21.53 41.52 24.32 38.53 23.79C35.54 23.26 33.68 19.62 34.38 15.64C35.08 11.67 38.08 8.88 41.07 9.41C44.06 9.94 45.92 13.58 45.22 17.56ZM54.08 31.69C52.29 35.05 48.75 36.67 46.16 35.29C43.58 33.92 42.93 30.08 44.72 26.71C46.51 23.35 50.05 21.73 52.64 23.11C55.22 24.48 55.87 28.32 54.08 31.69Z"
+                        transform="translate(104 38) scale(.3) rotate(100 32 32)"
+                        className="tp-route__paw"
+                      />
+                    </svg>
                   </div>
                 </div>
 
+                {/* Animated Typing Indicator */}
+                <p className="tp-typing" data-show={isTyping ? 'true' : 'false'} aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </p>
               </div>
-            </motion.div>
+
+              {/* Bottom WhatsApp Compose Button */}
+              <a
+                href="https://wa.me/919898124987?text=Hi%20Insta%20Biz%20Web%2C%20I'd%20like%20to%20discuss%20a%20project."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tp-phone__compose"
+              >
+                <span>Say hello on WhatsApp</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 20l18-8L3 4v6l12 2-12 2z" />
+                </svg>
+              </a>
+            </div>
+
+            {/* Mascot Beside Phone */}
+            <div data-pup-stop="true" data-pose="sit" data-facing="right" className="pup-stop tp-chat__teddy">
+              <PoodleMascot pose="sit" bubbleText={mascotBubble} />
+            </div>
           </div>
-
         </div>
-
-      </div>
-    </section>
+      </section>
+    </div>
   );
 };
