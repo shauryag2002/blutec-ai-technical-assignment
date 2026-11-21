@@ -23,6 +23,7 @@ interface PoodleMascotProps {
   className?: string;
   bubbleText?: string;
   flipProgress?: number;
+  facing?: 'left' | 'right';
 }
 
 /**
@@ -41,7 +42,8 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
   pose = 'sit',
   className = 'w-36 h-32',
   bubbleText,
-  flipProgress
+  flipProgress,
+  facing = 'right'
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -101,7 +103,7 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
           aria-label="Teddy, the TeddyPups puppy"
           focusable="false"
         >
-          <g data-p="root">
+          <g data-p="root" transform={facing === 'left' ? 'translate(300 0) scale(-1 1)' : undefined}>
             {/* Ground Shadow (when standing or sitting) */}
             <ellipse
               data-p="shadow"
@@ -223,7 +225,7 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               data-p="head"
               transform={
                 isPeeking
-                  ? 'translate(-62, 5)'
+                  ? 'translate(0 4) rotate(0 212 100)'
                   : isBowing
                   ? 'translate(14, 30)'
                   : isBasket
@@ -283,7 +285,6 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
             <g
               data-p="ledge"
               opacity={isPeeking || isBasket ? 1 : 0}
-              transform={isPeeking ? 'translate(-62, 5)' : isBasket ? 'translate(0, 9)' : undefined}
             >
               <path d="M175 159 C175 148 181 142 190 142 C199 142 205 148 205 159 Z M219 159 C219 148 225 142 234 142 C243 142 249 148 249 159 Z" fill="#f2be6b" stroke="#2a170e" strokeWidth="3.4" strokeLinejoin="round" strokeLinecap="round" />
               <path d="M186 153 v-4.5 M194 153 v-4.5 M230 153 v-4.5 M238 153 v-4.5" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" fill="none" />

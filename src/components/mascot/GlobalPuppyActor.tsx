@@ -47,6 +47,7 @@ export const GlobalPuppyActor: React.FC = () => {
     scale: number;
     pose: PoodlePose;
     facing: 'left' | 'right';
+    origin?: string;
     bubbleText?: string;
   }>({
     visible: false,
@@ -54,7 +55,8 @@ export const GlobalPuppyActor: React.FC = () => {
     y: 0,
     scale: 1,
     pose: 'peek',
-    facing: 'right'
+    facing: 'right',
+    origin: 'center center'
   });
 
   const [clickBubble, setClickBubble] = useState<string | undefined>(undefined);
@@ -147,10 +149,10 @@ export const GlobalPuppyActor: React.FC = () => {
           const rect = el.getBoundingClientRect();
           const docX = rect.left + rect.width / 2;
           const docY = rect.top + scrollY + rect.height / 2;
-          const scale = cfg.id === 'pup-stop-hero' ? 1.05 :
-                        cfg.id === 'pup-stop-meet' ? 0.78 :
-                        cfg.id === 'pup-stop-footer' ? 0.85 :
-                        Math.min(1.0, Math.max(0.72, rect.width / 240));
+          const scale = cfg.id === 'pup-stop-hero' || cfg.id === 'pup-stop-footer'
+            ? rect.width / 300
+            : cfg.id === 'pup-stop-meet' ? 0.78
+            : Math.min(1.0, Math.max(0.72, rect.width / 240));
 
           activeStops.push({
             config: cfg,
@@ -178,11 +180,12 @@ export const GlobalPuppyActor: React.FC = () => {
         const heroRect = heroStop.el.getBoundingClientRect();
         setPupState({
           visible: true,
-          x: heroRect.left + heroRect.width / 2 - 150,
-          y: heroRect.top + heroRect.height / 2 - 120,
-          scale: heroStop.scale,
+          x: heroRect.left,
+          y: heroRect.top,
+          scale: heroRect.width / 300,
           pose: 'peek',
           facing: 'right',
+          origin: '0 0',
           bubbleText: undefined
         });
         return;
@@ -200,27 +203,30 @@ export const GlobalPuppyActor: React.FC = () => {
 
         // Dock to footer basket when near footer
         const footerStop = activeStops.find(s => s.config.id === 'pup-stop-footer');
-        if (footerStop && footerStop.rect.top < window.innerHeight * 0.8) {
+        const isNearBottom = (window.innerHeight + scrollY >= document.documentElement.scrollHeight - 100) ||
+                             (footerStop && footerStop.rect.top <= window.innerHeight);
+
+        if (footerStop && isNearBottom) {
           const rect = footerStop.rect;
           setPupState({
             visible: true,
-            x: rect.left + rect.width / 2 - 150,
-            y: rect.top + rect.height / 2 - 120,
-            scale: 0.82,
+            x: rect.left,
+            y: rect.top,
+            scale: rect.width / 300,
             pose: 'snug',
             facing: 'right',
+            origin: '0 0',
             bubbleText: undefined
           });
           return;
         }
 
-        // Side lane margin peeking matching live site:
-        // Positioned safely above the sticky bottom bar and peeking from screen edges
-        const sceneIndex = Math.floor(scrollY / (window.innerHeight * 0.7));
-        const isLeft = sceneIndex % 2 === 0;
-        const peekScale = 0.48;
-        const peekX = isLeft ? -130 : (window.innerWidth - 44);
-        const peekY = bottomLimit - 120;
+        // Steady side lane margin peeking matching live site:
+        // Positioned safely above sticky bottom bar and peeking steadily from bottom corner
+        // Never flickers, teleports, or disappears!
+        const peekScale = 0.58;
+        const peekX = -64;
+        const peekY = bottomLimit - 110;
 
         setPupState({
           visible: true,
@@ -228,7 +234,8 @@ export const GlobalPuppyActor: React.FC = () => {
           y: peekY,
           scale: peekScale,
           pose: 'peek',
-          facing: isLeft ? 'right' : 'left',
+          facing: 'right',
+          origin: 'center center',
           bubbleText: undefined
         });
         return;
@@ -332,11 +339,32 @@ export const GlobalPuppyActor: React.FC = () => {
         }
       }
 
+      // Check if user has scrolled near the footer / basket
+      const footerStop = activeStops.find(s => s.config.id === 'pup-stop-footer');
+      const isAtBottom = (window.innerHeight + scrollY >= document.documentElement.scrollHeight - 100) ||
+                         (footerStop && footerStop.rect.top <= window.innerHeight);
+
+      if (footerStop && isAtBottom) {
+        clearAllFootprints();
+        const rect = footerStop.rect;
+        setPupState({
+          visible: true,
+          x: rect.left,
+          y: rect.top,
+          scale: rect.width / 300,
+          pose: 'snug',
+          facing: 'right',
+          origin: '0 0',
+          bubbleText: undefined
+        });
+        return;
+      }
+
       // 6. MULTI-STOP DESKTOP TRAVELER FOR SUBSEQUENT SECTIONS
       // Find active section stop
       const viewportMidY = scrollY + window.innerHeight * 0.5;
-      let currStopIdx = 1; // Start at Meet The Pups
-      for (let i = 1; i < activeStops.length; i++) {
+      let currStopIdx = 0;
+      for (let i = 0; i < activeStops.length; i++) {
         if (activeStops[i].docY <= viewportMidY) {
           currStopIdx = i;
         } else {
@@ -345,19 +373,25 @@ export const GlobalPuppyActor: React.FC = () => {
       }
 
       const fromStop = activeStops[currStopIdx];
+      if (!fromStop) {
+        setPupState(prev => ({ ...prev, visible: false }));
+        return;
+      }
       const toStop = activeStops[currStopIdx + 1];
 
       if (!toStop) {
         // Reached Final Stop: Starry Night Woven Basket
         clearAllFootprints();
         const rect = fromStop.el.getBoundingClientRect();
+        const isBasket = fromStop.config.id === 'pup-stop-footer';
         setPupState({
           visible: true,
-          x: rect.left + rect.width / 2 - 150,
-          y: rect.top + rect.height / 2 - 120,
-          scale: fromStop.scale,
-          pose: fromStop.config.defaultPose,
+          x: isBasket ? rect.left : (rect.left + rect.width / 2 - 150),
+          y: isBasket ? rect.top : (rect.top + rect.height / 2 - 120),
+          scale: isBasket ? (rect.width / 300) : fromStop.scale,
+          pose: isBasket ? 'snug' : fromStop.config.defaultPose,
           facing: fromStop.config.facing,
+          origin: isBasket ? '0 0' : 'center center',
           bubbleText: undefined
         });
         return;
@@ -369,6 +403,23 @@ export const GlobalPuppyActor: React.FC = () => {
       const t = Math.min(Math.max(rawT, 0), 1);
       const ease = t * t * (3 - 2 * t);
 
+      // Settle into footer basket when approaching footer stop
+      if (toStop.config.id === 'pup-stop-footer' && (t >= 0.5 || (footerStop && footerStop.rect.top <= window.innerHeight))) {
+        clearAllFootprints();
+        const rect = toStop.el.getBoundingClientRect();
+        setPupState({
+          visible: true,
+          x: rect.left,
+          y: rect.top,
+          scale: rect.width / 300,
+          pose: 'snug',
+          facing: 'right',
+          origin: '0 0',
+          bubbleText: undefined
+        });
+        return;
+      }
+
       // Section Hold Windows: Holding at a stop vs Traveling between stops
       const isHoldingFrom = t < 0.2;
       const isHoldingTo = t > 0.8;
@@ -378,13 +429,15 @@ export const GlobalPuppyActor: React.FC = () => {
         clearAllFootprints();
         const stop = isHoldingFrom ? fromStop : toStop;
         const rect = stop.el.getBoundingClientRect();
+        const isBasket = stop.config.id === 'pup-stop-footer';
         setPupState({
           visible: true,
-          x: rect.left + rect.width / 2 - 150,
-          y: rect.top + rect.height / 2 - 120,
-          scale: stop.scale,
+          x: isBasket ? rect.left : (rect.left + rect.width / 2 - 150),
+          y: isBasket ? rect.top : (rect.top + rect.height / 2 - 120),
+          scale: isBasket ? (rect.width / 300) : stop.scale,
           pose: stop.config.defaultPose,
           facing: stop.config.facing,
+          origin: isBasket ? '0 0' : 'center center',
           bubbleText: undefined
         });
         return;
@@ -476,7 +529,7 @@ export const GlobalPuppyActor: React.FC = () => {
       {/* Viewport Fixed Roaming Mascot Layer */}
       {pupState.visible && (
         <div
-          className="pup-layer fixed inset-0 pointer-events-none z-30 overflow-clip"
+          className="pup-layer fixed inset-0 pointer-events-none z-[15] overflow-clip"
           aria-hidden="true"
         >
           <div
@@ -490,8 +543,8 @@ export const GlobalPuppyActor: React.FC = () => {
             <div
               className="pup-actor__body"
               style={{
-                transform: `scale(${pupState.scale.toFixed(3)}) ${pupState.facing === 'left' ? 'scaleX(-1)' : ''}`,
-                transformOrigin: 'center center'
+                transform: `scale(${pupState.scale.toFixed(4)}) ${pupState.facing === 'left' ? 'scaleX(-1)' : ''}`,
+                transformOrigin: pupState.origin || 'center center'
               }}
             >
               <PoodleMascot

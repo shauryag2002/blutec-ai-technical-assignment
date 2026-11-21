@@ -21,40 +21,40 @@ const HERO_SEATS = [
 
 const HERO_LINEUP: LineupPuppy[] = [
   {
-    name: 'Toy Poodle',
-    breed: 'Toy Poodle',
-    image: '/puppies/seat-0.jpg',
-    slug: 'toy-poodle-male-female'
-  },
-  {
     name: 'Max',
     breed: 'Maltipoo',
-    image: '/puppies/seat-1.webp',
+    image: '/puppies/hero-seat-0.webp',
     slug: 'maltipoo-max-male'
   },
   {
-    name: 'Korean Teacup Pomeranian',
-    breed: 'Korean Teacup Pomeranian',
-    image: '/puppies/seat-2.jpg',
-    slug: 'korean-teacup-pomeranian'
+    name: 'Korean Teacup Maltipoo',
+    breed: 'Korean Teacup Maltipoo',
+    image: '/puppies/hero-seat-1.jpg',
+    slug: 'korean-teacup-maltipoo-female'
   },
   {
-    name: 'Copper',
-    breed: 'Cavapoo',
-    image: '/puppies/seat-3.jpg',
-    slug: 'copper-male'
+    name: 'Korean Teacup Poodle',
+    breed: 'Korean Teacup Poodle',
+    image: '/puppies/hero-seat-2.jpg',
+    slug: 'korean-teacup-poodle-female'
   },
   {
-    name: 'Maltipoo',
-    breed: 'Maltipoo',
-    image: '/puppies/seat-4.jpg',
-    slug: 'maltipoo-female'
+    name: 'Maltipoo & Cavapoo',
+    breed: 'Maltipoo & Cavapoo',
+    image: '/puppies/hero-seat-3.jpg',
+    slug: 'maltipoo-cavapoo-male'
   },
   {
     name: 'Pomeranian',
     breed: 'Pomeranian',
-    image: '/puppies/seat-5.jpg',
-    slug: 'pomeranian-female'
+    image: '/puppies/hero-seat-4.jpg',
+    slug: 'toy-poodle-male-female'
+  },
+  {
+    name: 'Maltipoo',
+    breed: 'Maltipoo',
+    image: '/puppies/hero-seat-5.jpg',
+    slug: 'maltipoo-female-2'
   }
 ];
 

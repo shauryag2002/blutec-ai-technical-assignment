@@ -61,7 +61,12 @@ export const PUPPIES: Puppy[] = [
     gender: 'girl',
     age: '2 months',
     collection: 'korean-teacup',
-    image: 'https://puppy.instabizweb.com/_next/image?url=%2Fmedia%2FxeMJCapr5vcU%2Fe618c653b2%2Fb942a5_14376a216177484dbbb27995d0f6aeb7-mv2.jpg&w=1200&q=75',
+    image: '/puppies/poodle-1.jpg',
+    secondaryImages: [
+      '/puppies/poodle-2.jpg',
+      '/puppies/poodle-3.jpg',
+      '/puppies/poodle-4.jpg'
+    ],
     hasVideo: false,
     isAvailable: true,
     description: 'A pocket-sized red curly treasure. Highly intelligent, quick to learn potty habits, and loves following you everywhere.',
