@@ -1,81 +1,143 @@
 import React from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import { StickerButton } from '../../components/ui/StickerButton';
 import { PoodleMascot } from '../../components/mascot/PoodleMascot';
-import { FAQS } from '../../data/faqs';
+
+interface StarProps {
+  left: string;
+  top: string;
+  width: string;
+  delay: string;
+}
+
+const STARS: StarProps[] = [
+  { left: '8%', top: '12%', width: '16.2px', delay: '0.00s' },
+  { left: '22%', top: '30%', width: '9px', delay: '0.40s' },
+  { left: '41%', top: '8%', width: '12.6px', delay: '0.80s' },
+  { left: '57%', top: '22%', width: '8.1px', delay: '1.20s' },
+  { left: '72%', top: '6%', width: '14.4px', delay: '1.60s' },
+  { left: '88%', top: '18%', width: '10.8px', delay: '2.00s' },
+  { left: '95%', top: '42%', width: '9px', delay: '2.40s' },
+  { left: '4%', top: '58%', width: '10.8px', delay: '2.80s' },
+  { left: '34%', top: '70%', width: '7.2px', delay: '3.20s' },
+  { left: '63%', top: '84%', width: '9.9px', delay: '3.60s' },
+  { left: '83%', top: '66%', width: '12.6px', delay: '4.00s' },
+];
 
 export const QuestionsSection: React.FC = () => {
-  const sparkleFaqs = FAQS.filter((f) => f.isSparkle);
-
   return (
-    <section id="questions-section" className="relative pt-20 pb-16 bg-[#23170F] text-cream-light overflow-hidden">
-      {/* Twinkling Gold Stars Background */}
-      <div className="absolute inset-0 pointer-events-none opacity-85">
-        <div className="absolute top-10 left-12 text-honey text-sm animate-twinkle">✦</div>
-        <div className="absolute top-32 right-1/4 text-honey text-xs animate-twinkle" style={{ animationDelay: '0.7s' }}>✦</div>
-        <div className="absolute bottom-20 left-1/3 text-honey text-base animate-twinkle" style={{ animationDelay: '1.2s' }}>✦</div>
-        <div className="absolute bottom-16 right-16 text-honey text-xs animate-twinkle" style={{ animationDelay: '0.4s' }}>✦</div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          
-          {/* Left Column */}
-          <div className="lg:col-span-5 select-none">
-            <span className="font-script text-honey text-2xl font-bold flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-honey" />
-              <span>peace of mind</span>
-            </span>
-            <h2 className="font-display font-extrabold text-3xl sm:text-5xl text-cream-light tracking-tight mt-1">
-              Questions, answered
-            </h2>
-            <p className="mt-4 font-sans text-base sm:text-lg text-cream/75 leading-relaxed">
-              Everything you need to know about puppy health clearances, visits to our Downtown showroom, and safe delivery across the UAE.
-            </p>
-
-            <div className="mt-8">
-              <StickerButton
-                to="/faq"
-                variant="cream"
-                size="md"
-                icon={<ArrowRight className="w-4 h-4" />}
-              >
-                Read all questions
-              </StickerButton>
-            </div>
-
-            {/* Standing Poodle Mascot with Question Bubble */}
-            <div className="mt-12 flex items-center">
-              <PoodleMascot pose="think" className="w-32 h-28" bubbleText="curious? 🐾" />
-            </div>
-          </div>
-
-          {/* Right Column: 3 Clean Q&A Cards with Gold Sparkles */}
-          <div className="lg:col-span-7 space-y-4">
-            {sparkleFaqs.map((faq) => (
-              <div
-                key={faq.id}
-                className="bg-[#2E1E14] text-cream-light p-6 sm:p-7 rounded-2xl border-[1.5px] border-cream/15 shadow-sm hover:border-cream/30 transition-all select-none"
-              >
-                <div className="flex items-start gap-3.5">
-                  <span className="text-honey text-base shrink-0 mt-0.5">✦</span>
-                  <div>
-                    <h3 className="font-sans font-semibold text-lg text-cream-light mb-1.5">
-                      {faq.question}
-                    </h3>
-                    <p className="font-sans text-sm sm:text-base text-cream/80 leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
+    <div data-section="questions">
+      <section
+        data-pup-scene="true"
+        data-tone="dark"
+        className="tp-scene tp-night"
+        style={{
+          '--sky-top': '#4d2b19',
+          '--sky-bottom': '#2f1a10',
+        } as React.CSSProperties}
+        aria-labelledby="questions-title"
+        data-here="false"
+        data-visited="true"
+      >
+        {/* Twinkling Starfield in Night Sky */}
+        <div aria-hidden="true" className="pointer-events-none tp-night__stars">
+          {STARS.map((star, idx) => (
+            <svg
+              key={idx}
+              viewBox="0 0 40 40"
+              className="tp-twinkle absolute text-honey"
+              style={{
+                left: star.left,
+                top: star.top,
+                width: star.width,
+                animationDelay: star.delay,
+              }}
+              aria-hidden="true"
+            >
+              <path
+                d="M20 3c1.6 9.4 7.6 15.4 17 17-9.4 1.6-15.4 7.6-17 17-1.6-9.4-7.6-15.4-17-17 9.4-1.6 15.4-7.6 17-17z"
+                fill="currentColor"
+              />
+            </svg>
+          ))}
         </div>
 
-      </div>
-    </section>
+        {/* Night Grid: Intro on Left, FAQs on Right */}
+        <div className="tp-night__grid gutter">
+          <div className="tp-night__intro">
+            <h2 id="questions-title" className="font-plush text-huge">
+              Questions, answered
+            </h2>
+            <a className="btn btn-ghost tp-night__cta   px-7 py-3 text-base font-semibold shrink-0" href="/faq">
+              Read all questions
+            </a>
+            <div className="tp-night__pup">
+              <span aria-hidden="true" className="tp-night__wonder font-plush">
+                ?
+              </span>
+              <div
+                data-pup-stop="true"
+                data-pose="sit"
+                data-facing="right"
+                data-act="tilt"
+                className="pup-stop tp-night__teddy"
+              >
+                <PoodleMascot pose="sit" bubbleText="curious? 🐾" />
+              </div>
+            </div>
+          </div>
+
+          <dl className="tp-night__list">
+            {/* QA 1 */}
+            <div className="tp-qa" data-pup-look="">
+              <dt className="font-plush tp-qa__q">
+                <svg viewBox="0 0 40 40" className="tp-qa__star" aria-hidden="true">
+                  <path
+                    d="M20 3c1.6 9.4 7.6 15.4 17 17-9.4 1.6-15.4 7.6-17 17-1.6-9.4-7.6-15.4-17-17 9.4-1.6 15.4-7.6 17-17z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Are your puppies vaccinated and health-checked?
+              </dt>
+              <dd className="tp-qa__a">
+                Yes. All our puppies come with a verified health certificate from licensed vets. Every puppy is
+                vaccinated, dewormed, and thoroughly checked before joining your family.
+              </dd>
+            </div>
+
+            {/* QA 2 */}
+            <div className="tp-qa" data-pup-look="">
+              <dt className="font-plush tp-qa__q">
+                <svg viewBox="0 0 40 40" className="tp-qa__star" aria-hidden="true">
+                  <path
+                    d="M20 3c1.6 9.4 7.6 15.4 17 17-9.4 1.6-15.4 7.6-17 17-1.6-9.4-7.6-15.4-17-17 9.4-1.6 15.4-7.6 17-17z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Can I meet a puppy before I decide?
+              </dt>
+              <dd className="tp-qa__a">
+                Yes. Come meet our locally available puppies in our Downtown Dubai showroom and spend time bonding before
+                making your decision.
+              </dd>
+            </div>
+
+            {/* QA 3 */}
+            <div className="tp-qa">
+              <dt className="font-plush tp-qa__q">
+                <svg viewBox="0 0 40 40" className="tp-qa__star" aria-hidden="true">
+                  <path
+                    d="M20 3c1.6 9.4 7.6 15.4 17 17-9.4 1.6-15.4 7.6-17 17-1.6-9.4-7.6-15.4-17-17 9.4-1.6 15.4-7.6 17-17z"
+                    fill="currentColor"
+                  />
+                </svg>
+                Can I take my puppy home the same day?
+              </dt>
+              <dd className="tp-qa__a">
+                Local puppies are available immediately, so you can take your puppy home the same day.
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </div>
   );
 };

@@ -224,7 +224,7 @@ export const HappyFamiliesSection: React.FC = () => {
               <span aria-hidden="true" className="tp-lamp">
                 <span className="tp-lamp__light" />
               </span>
-              <a className="btn btn-primary tp-facade__cta" href="/happy-families">
+              <a className="btn btn-primary tp-facade__cta   px-7 py-3 text-base font-semibold shrink-0" href="/happy-families">
                 See every happy family
               </a>
               <div data-pup-stop="true" data-pose="sit" data-facing="right" className="pup-stop tp-dusk__teddy">

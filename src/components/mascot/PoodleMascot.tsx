@@ -14,7 +14,8 @@ export type PoodlePose =
   | 'peek'
   | 'walk'
   | 'think'
-  | 'basket';
+  | 'basket'
+  | 'bow';
 
 interface PoodleMascotProps {
   pose?: PoodlePose;
@@ -33,7 +34,7 @@ interface PoodleMascotProps {
  * - Soft rosy cheeks (#f9b9a6) and rust collar with heart tag (#a24a1a)
  * - Interactive mouse eye-tracking with spring physics
  * - Hover tail wiggle on the pom-pom tail
- * - Dynamic pose switching: 'peek' / 'hero-peek' (resting paws on quilt), 'walk' / 'side-walk' (stepping legs), 'sit'
+ * - Dynamic pose switching: 'peek' / 'hero-peek', 'walk' / 'side-walk', 'sit', 'bow'
  */
 export const PoodleMascot: React.FC<PoodleMascotProps> = ({
   pose = 'sit',
@@ -50,7 +51,8 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
   // Normalize pose mappings
   const isPeeking = pose === 'peek' || pose === 'hero-peek' || pose === 'signpost-peek';
   const isSitting = pose === 'sit' || pose === 'passport-stand' || pose === 'think';
-  const isWalking = !isPeeking && !isSitting;
+  const isBowing = pose === 'bow';
+  const isWalking = !isPeeking && !isSitting && !isBowing;
 
   return (
     <div
@@ -113,7 +115,13 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
             <g
               data-p="body"
               opacity={isPeeking ? 0 : 1}
-              transform={isSitting ? 'translate(0 -2) rotate(-24 196 206)' : undefined}
+              transform={
+                isSitting
+                  ? 'translate(0 -2) rotate(-24 196 206)'
+                  : isBowing
+                  ? 'translate(0 2) rotate(15 196 206)'
+                  : undefined
+              }
             >
               {/* Back foot (far) */}
               <g
@@ -135,7 +143,7 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               <g transform="translate(168, 192)">
                 <motion.g
                   data-p="ff"
-                  animate={isWalking ? { rotate: [22, -22, 22] } : { rotate: isSitting ? 24 : 0 }}
+                  animate={isWalking ? { rotate: [22, -22, 22] } : { rotate: isSitting ? 24 : isBowing ? -67 : 0 }}
                   transition={isWalking ? { repeat: Infinity, duration: 0.65, ease: 'easeInOut' } : { duration: 0.3 }}
                 >
                   <path d="M-11 -14 C-11 4 -12 18 -12 27 C-12 34 -7 36 0 36 C9 36 13 33 13 27 C13 18 11 4 11 -14Z" fill="#e4a352" />
@@ -148,7 +156,15 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               <g transform="translate(84, 150)">
                 <motion.g
                   data-p="tail"
-                  animate={isHovered ? { rotate: [-28, 14, -28] } : { rotate: isSitting ? [28, 36, 28] : [-5, 5, -5] }}
+                  animate={
+                    isHovered
+                      ? { rotate: [-28, 14, -28] }
+                      : isSitting
+                      ? { rotate: [28, 36, 28] }
+                      : isBowing
+                      ? { rotate: [-36, -28, -36] }
+                      : { rotate: [-5, 5, -5] }
+                  }
                   transition={{ repeat: Infinity, duration: isHovered ? 0.35 : 1.2, ease: 'easeInOut' }}
                 >
                   <path d="M2 2 C-4 -4 -8 -10 -10 -14" stroke="#2a170e" strokeWidth="9" strokeLinejoin="round" strokeLinecap="round" fill="none" />
@@ -183,7 +199,7 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               <g transform="translate(186, 194)">
                 <motion.g
                   data-p="fn"
-                  animate={isWalking ? { rotate: [-22, 22, -22] } : { rotate: isSitting ? 24 : 0 }}
+                  animate={isWalking ? { rotate: [-22, 22, -22] } : { rotate: isSitting ? 24 : isBowing ? -73 : 0 }}
                   transition={isWalking ? { repeat: Infinity, duration: 0.65, ease: 'easeInOut' } : { duration: 0.3 }}
                 >
                   <path d="M-12 -14 C-12 4 -12 16 -12 25 C-12 32 -7 34 0 34 C9 34 13 31 13 25 C13 16 12 4 12 -14Z" fill="#f2be6b" />
@@ -201,7 +217,16 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
             </g>
 
             {/* Head & Facial Features */}
-            <g data-p="head" transform={isPeeking ? 'translate(-62, 5)' : 'translate(0, 4)'}>
+            <g
+              data-p="head"
+              transform={
+                isPeeking
+                  ? 'translate(-62, 5)'
+                  : isBowing
+                  ? 'translate(14, 30)'
+                  : 'translate(0, 4)'
+              }
+            >
               {/* Rust Collar with Small Cream Heart Tag */}
               <path d="M178 146 Q212 162 246 146 L246 154 Q212 170 178 154 Z" fill="#a24a1a" stroke="#2a170e" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
               <path d="M212 160 C212 156 206 155 206 159.4 C206 163 212 166.6 212 168.4 C212 166.6 218 163 218 159.4 C218 155 212 156 212 160 Z" fill="#fbe3b4" stroke="#2a170e" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
@@ -221,8 +246,8 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
               <circle cx="181" cy="116" r="7" fill="#f9b9a6" opacity="0.85" />
               <circle cx="243" cy="116" r="7" fill="#f9b9a6" opacity="0.85" />
 
-              {/* Dark Rounded Eyes with Interactive Eye-Tracking */}
-              <g data-p="eyes">
+              {/* Dark Rounded Eyes (or happy closed eyes in bow mode) */}
+              <g data-p="eyes" opacity={isBowing ? 0 : 1}>
                 <motion.ellipse cx="194" cy="98" rx="7.4" ry="8.6" fill="#2a170e" style={{ x: pupilX, y: pupilY }} />
                 <motion.ellipse cx="230" cy="98" rx="7.4" ry="8.6" fill="#2a170e" style={{ x: pupilX, y: pupilY }} />
                 {/* Specular highlights that follow mouse cursor */}
@@ -231,6 +256,18 @@ export const PoodleMascot: React.FC<PoodleMascotProps> = ({
                 <motion.circle cx="192" cy="101.2" r="1.2" fill="#fff" style={{ x: highlightX, y: highlightY }} />
                 <motion.circle cx="228" cy="101.2" r="1.2" fill="#fff" style={{ x: highlightX, y: highlightY }} />
               </g>
+
+              {/* Happy squint eyes when bowing */}
+              <path
+                data-p="happy"
+                d="M186.5 101 Q194 91.5 201.5 101 M222.5 101 Q230 91.5 237.5 101"
+                stroke="#2a170e"
+                strokeWidth="3.4"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                fill="none"
+                opacity={isBowing ? 1 : 0}
+              />
 
               {/* Rounded Dark Nose, Friendly Smile & Tongue */}
               <path d="M204.5 111.5 Q212 107.2 219.5 111.5 Q218.2 118.4 212 120 Q205.8 118.4 204.5 111.5 Z" fill="#2a170e" />
