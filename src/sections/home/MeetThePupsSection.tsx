@@ -144,7 +144,7 @@ export const MeetThePupsSection: React.FC = () => {
                       key={puppy.id}
                       puppy={puppy}
                       doorColor={DOOR_WOOD_COLORS[idx % DOOR_WOOD_COLORS.length]}
-                      isOpenControlled={mobileOpenSlug === puppy.slug}
+                      isOpenControlled={true}
                       onToggleOpen={() =>
                         setMobileOpenSlug((prev) => (prev === puppy.slug ? null : puppy.slug))
                       }

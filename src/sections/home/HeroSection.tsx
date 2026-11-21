@@ -219,7 +219,7 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Hero Stage Section (<div class="tp-hero__stage">) */}
-      <div className="tp-hero__stage select-none">
+      <div className="tp-hero__stage select-none z-10">
 
         {/* Lineup of Seated Puppies */}
         <ul className="tp-lineup" aria-label="Some of the puppies in our showroom">

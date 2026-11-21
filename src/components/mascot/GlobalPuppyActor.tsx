@@ -165,7 +165,11 @@ export const GlobalPuppyActor: React.FC = () => {
         }
       }
 
-      if (activeStops.length === 0) {
+      // If on mobile or on pages with fewer than 2 stops (non-home pages),
+      // disable roaming actor and let natural section buddies render with zero flicker/disappearing
+      if (activeStops.length < 2 || isMobile) {
+        clearAllFootprints();
+        delete document.documentElement.dataset.pup;
         setPupState(prev => ({ ...prev, visible: false }));
         return;
       }
@@ -186,56 +190,6 @@ export const GlobalPuppyActor: React.FC = () => {
           pose: 'peek',
           facing: 'right',
           origin: '0 0',
-          bubbleText: undefined
-        });
-        return;
-      }
-
-      // 3. MOBILE RESPONSIVE BEHAVIOR
-      if (isMobile) {
-        clearAllFootprints();
-        wasTravelingRef.current = false;
-
-        // Sticky bottom WhatsApp bar offset
-        const barEl = document.querySelector('[data-whatsapp-bar="true"]');
-        const barHeight = barEl ? barEl.getBoundingClientRect().height : 60;
-        const bottomLimit = window.innerHeight - barHeight;
-
-        // Dock to footer basket when near footer
-        const footerStop = activeStops.find(s => s.config.id === 'pup-stop-footer');
-        const isNearBottom = (window.innerHeight + scrollY >= document.documentElement.scrollHeight - 100) ||
-                             (footerStop && footerStop.rect.top <= window.innerHeight);
-
-        if (footerStop && isNearBottom) {
-          const rect = footerStop.rect;
-          setPupState({
-            visible: true,
-            x: rect.left,
-            y: rect.top,
-            scale: rect.width / 300,
-            pose: 'snug',
-            facing: 'right',
-            origin: '0 0',
-            bubbleText: undefined
-          });
-          return;
-        }
-
-        // Steady side lane margin peeking matching live site:
-        // Positioned safely above sticky bottom bar and peeking steadily from bottom corner
-        // Never flickers, teleports, or disappears!
-        const peekScale = 0.58;
-        const peekX = -64;
-        const peekY = bottomLimit - 110;
-
-        setPupState({
-          visible: true,
-          x: peekX,
-          y: peekY,
-          scale: peekScale,
-          pose: 'peek',
-          facing: 'right',
-          origin: 'center center',
           bubbleText: undefined
         });
         return;
@@ -339,24 +293,15 @@ export const GlobalPuppyActor: React.FC = () => {
         }
       }
 
-      // Check if user has scrolled near the footer / basket
+      // Check if user has scrolled near the footer / basket:
+      // Hand off cleanly to native basket puppy nestled inside .tp-basket
       const footerStop = activeStops.find(s => s.config.id === 'pup-stop-footer');
       const isAtBottom = (window.innerHeight + scrollY >= document.documentElement.scrollHeight - 100) ||
                          (footerStop && footerStop.rect.top <= window.innerHeight);
 
       if (footerStop && isAtBottom) {
         clearAllFootprints();
-        const rect = footerStop.rect;
-        setPupState({
-          visible: true,
-          x: rect.left,
-          y: rect.top,
-          scale: rect.width / 300,
-          pose: 'snug',
-          facing: 'right',
-          origin: '0 0',
-          bubbleText: undefined
-        });
+        setPupState(prev => ({ ...prev, visible: false }));
         return;
       }
 
@@ -382,18 +327,7 @@ export const GlobalPuppyActor: React.FC = () => {
       if (!toStop) {
         // Reached Final Stop: Starry Night Woven Basket
         clearAllFootprints();
-        const rect = fromStop.el.getBoundingClientRect();
-        const isBasket = fromStop.config.id === 'pup-stop-footer';
-        setPupState({
-          visible: true,
-          x: isBasket ? rect.left : (rect.left + rect.width / 2 - 150),
-          y: isBasket ? rect.top : (rect.top + rect.height / 2 - 120),
-          scale: isBasket ? (rect.width / 300) : fromStop.scale,
-          pose: isBasket ? 'snug' : fromStop.config.defaultPose,
-          facing: fromStop.config.facing,
-          origin: isBasket ? '0 0' : 'center center',
-          bubbleText: undefined
-        });
+        setPupState(prev => ({ ...prev, visible: false }));
         return;
       }
 
@@ -406,17 +340,7 @@ export const GlobalPuppyActor: React.FC = () => {
       // Settle into footer basket when approaching footer stop
       if (toStop.config.id === 'pup-stop-footer' && (t >= 0.5 || (footerStop && footerStop.rect.top <= window.innerHeight))) {
         clearAllFootprints();
-        const rect = toStop.el.getBoundingClientRect();
-        setPupState({
-          visible: true,
-          x: rect.left,
-          y: rect.top,
-          scale: rect.width / 300,
-          pose: 'snug',
-          facing: 'right',
-          origin: '0 0',
-          bubbleText: undefined
-        });
+        setPupState(prev => ({ ...prev, visible: false }));
         return;
       }
 
@@ -428,16 +352,19 @@ export const GlobalPuppyActor: React.FC = () => {
         // Holding at stop: footprints removed!
         clearAllFootprints();
         const stop = isHoldingFrom ? fromStop : toStop;
+        if (stop.config.id === 'pup-stop-footer') {
+          setPupState(prev => ({ ...prev, visible: false }));
+          return;
+        }
         const rect = stop.el.getBoundingClientRect();
-        const isBasket = stop.config.id === 'pup-stop-footer';
         setPupState({
           visible: true,
-          x: isBasket ? rect.left : (rect.left + rect.width / 2 - 150),
-          y: isBasket ? rect.top : (rect.top + rect.height / 2 - 120),
-          scale: isBasket ? (rect.width / 300) : stop.scale,
+          x: rect.left + rect.width / 2 - 150,
+          y: rect.top + rect.height / 2 - 120,
+          scale: stop.scale,
           pose: stop.config.defaultPose,
           facing: stop.config.facing,
-          origin: isBasket ? '0 0' : 'center center',
+          origin: 'center center',
           bubbleText: undefined
         });
         return;

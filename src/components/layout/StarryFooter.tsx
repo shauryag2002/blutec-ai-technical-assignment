@@ -125,7 +125,7 @@ export const StarryFooter: React.FC = () => {
               className="pup-stop tp-basket__pup"
             >
               <div className="pup-buddy" data-facing="right" data-live="">
-                <PoodleMascot pose="snug" />
+                <PoodleMascot pose="snug" className="w-full h-full" />
               </div>
             </div>
             <svg aria-hidden="true" viewBox="0 0 300 240" className="tp-basket__front">

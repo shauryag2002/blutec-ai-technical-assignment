@@ -20,7 +20,7 @@ import { CONTACT_DETAILS } from '../../data/navigation';
  * - StarryFooter
  */
 export const Layout: React.FC = () => {
-  const { isTransitioning } = useRouteTransition();
+  const { curtainState } = useRouteTransition();
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-espresso selection:bg-honey selection:text-espresso relative">
@@ -62,7 +62,7 @@ export const Layout: React.FC = () => {
       <GlobalPuppyActor />
 
       {/* Scalloped Curtain Preloader & Route Transition */}
-      <RouteTransition isTransitioning={isTransitioning} />
+      <RouteTransition curtainState={curtainState} />
 
       {/* Continuous Starry Night Footer */}
       <StarryFooter />
