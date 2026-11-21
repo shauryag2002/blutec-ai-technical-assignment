@@ -1,152 +1,276 @@
-import React from 'react';
-import { ArrowRight, Quote } from 'lucide-react';
-import { WashiTapePolaroid } from '../../components/ui/WashiTapePolaroid';
-import { StickerButton } from '../../components/ui/StickerButton';
+import React, { useEffect, useRef, useState } from 'react';
 import { PoodleMascot } from '../../components/mascot/PoodleMascot';
-import { FEATURED_TESTIMONIAL, HAPPY_FAMILIES } from '../../data/happyFamilies';
+
+interface PolaroidItem {
+  id: number;
+  caption: string;
+  image: string;
+  tilt: string;
+  tape: string;
+  tapeType: 'center' | 'left' | 'right' | 'corners';
+  delay: string;
+  bgColor: string;
+  pupLook?: boolean;
+}
+
+const POLAROIDS: PolaroidItem[] = [
+  {
+    id: 1,
+    caption: 'Lulu 🧸 with her new mummy ❤️',
+    image: '/puppies/family-1.jpg',
+    tilt: '-2.2deg',
+    tape: '#f6d79a',
+    tapeType: 'center',
+    delay: '330ms',
+    bgColor: 'rgb(216, 184, 152)',
+  },
+  {
+    id: 2,
+    caption: 'Adorable Maltipoo baby 🧸❤️',
+    image: '/puppies/family-2.jpg',
+    tilt: '1.6deg',
+    tape: '#f9cdbf',
+    tapeType: 'left',
+    delay: '0ms',
+    bgColor: 'rgb(216, 184, 136)',
+    pupLook: true,
+  },
+  {
+    id: 3,
+    caption: 'My new teddy puppy 🥰🧸',
+    image: '/puppies/family-3.jpg',
+    tilt: '-0.9deg',
+    tape: '#cfe5f6',
+    tapeType: 'right',
+    delay: '550ms',
+    bgColor: 'rgb(200, 184, 152)',
+  },
+  {
+    id: 4,
+    caption: 'Our new puppies 🧸🥰🤗',
+    image: '/puppies/family-4.jpg',
+    tilt: '2.4deg',
+    tape: '#f6d79a',
+    tapeType: 'corners',
+    delay: '110ms',
+    bgColor: 'rgb(200, 168, 136)',
+  },
+  {
+    id: 5,
+    caption: 'New puppy 🧸😍',
+    image: '/puppies/family-5.jpg',
+    tilt: '-1.5deg',
+    tape: '#e9dcc4',
+    tapeType: 'center',
+    delay: '660ms',
+    bgColor: 'rgb(232, 216, 184)',
+    pupLook: true,
+  },
+  {
+    id: 6,
+    caption: 'Gang of 3 😍🧸',
+    image: '/puppies/family-6.jpg',
+    tilt: '0.8deg',
+    tape: '#f6d79a',
+    tapeType: 'right',
+    delay: '220ms',
+    bgColor: 'rgb(184, 152, 120)',
+  },
+  {
+    id: 7,
+    caption: 'So happy 😍😍',
+    image: '/puppies/family-7.jpg',
+    tilt: '-2.6deg',
+    tape: '#f9cdbf',
+    tapeType: 'left',
+    delay: '770ms',
+    bgColor: 'rgb(88, 56, 56)',
+  },
+  {
+    id: 8,
+    caption: 'New pup 🤗💫',
+    image: '/puppies/family-8.jpg',
+    tilt: '1.2deg',
+    tape: '#cfe5f6',
+    tapeType: 'center',
+    delay: '440ms',
+    bgColor: 'rgb(24, 40, 72)',
+  },
+];
 
 export const HappyFamiliesSection: React.FC = () => {
+  const wallRef = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<PolaroidItem | null>(null);
+
+  useEffect(() => {
+    const el = wallRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealed(true);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="happy-families" className="relative overflow-hidden">
-      
-      {/* UPPER BAND: Burnt-Sienna / Terracotta with Dubai Sunset Skyline Silhouette */}
-      <div className="relative pt-20 pb-12 bg-terracotta text-cream-light border-b-[1.5px] border-espresso-border">
-        
-        {/* Layered Dubai Sunset Skyline with Burj Khalifa Spire Silhouette */}
-        <div className="absolute top-0 left-0 right-0 h-28 pointer-events-none opacity-20 overflow-hidden">
-          <svg viewBox="0 0 1440 140" preserveAspectRatio="none" className="w-full h-full text-black fill-current">
-            <path d="M0 140 V90 h40 V75 h20 V90 h30 V60 h15 V90 h20 V45 h25 V90 h40 V30 h10 V10 l4-6 v-4 l2-2 2 2 v4 l4 6 v20 h10 V90 h30 V50 h25 V90 h40 V65 h20 V90 h50 V40 h20 V90 h80 V55 h25 V90 h40 V35 h15 V90 h30 V70 h20 V90 h60 V45 h20 V90 h50 V60 h20 V90 h100 V30 h10 V10 l4-6 v-4 l2-2 2 2 v4 l4 6 v20 h10 V90 h40 V50 h25 V90 h60 V70 h20 V90 h50 V40 h20 V90 h150 V60 h20 V90 H1440 V140 Z" />
-          </svg>
+    <div data-section="families">
+      <section
+        data-pup-scene="true"
+        data-tone="dark"
+        className="tp-scene tp-dusk"
+        style={{
+          '--sky-top': '#a65a30',
+          '--sky-bottom': '#4d2b19',
+        } as React.CSSProperties}
+        aria-labelledby="dusk-title"
+        data-here="false"
+        data-visited="false"
+      >
+        {/* Top Dusk Sky Header & Client Testimonial Note */}
+        <div className="tp-dusk__sky gutter">
+          <div className="tp-dusk__head">
+            <h2 id="dusk-title" className="font-plush text-huge text-white">
+              Happy families &amp; puppies
+            </h2>
+            <p className="text-lede mt-5 max-w-[50ch] text-[var(--ink-soft)]">
+              We are truly honored to see our puppies become cherished members of loving families. These heartwarming
+              moments have been shared by our valued clients who welcomed a Teddy Pup into their homes and hearts.
+            </p>
+          </div>
+
+          <figure className="tp-dusk__note">
+            <blockquote className="font-plush-text">
+              “TeddyPups truly made our dream a reality. They supported us at every step of the import journey. Our
+              Maltipoo arrived healthy, cheerful, and absolutely perfect. Having 24/7 support throughout the process
+              gave us complete peace of mind.”
+            </blockquote>
+            <figcaption className="font-scrawl">Sarah M., Dubai, UAE</figcaption>
+          </figure>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          {/* Header */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 mb-12 select-none">
-            <div>
-              <span className="font-script text-honey text-2xl font-bold">
-                64 moments and counting
+        {/* Photowall Wooden Shelf Wall */}
+        <div className="tp-photowall" ref={wallRef}>
+          <div className="tp-photowall__wall">
+            <ul className="tp-photowall__prints" aria-label="Photos from TeddyPups families">
+              {POLAROIDS.map((item, idx) => (
+                <li
+                  key={item.id}
+                  data-reveal="true"
+                  data-pup-look={item.pupLook ? '' : undefined}
+                  style={{ '--d': item.delay } as React.CSSProperties}
+                  data-armed="true"
+                  data-revealed={revealed ? 'true' : 'false'}
+                >
+                  <button
+                    type="button"
+                    className="tp-photowall__print"
+                    aria-label={`Open photo ${item.id} of 64: ${item.caption}`}
+                    onClick={() => setSelectedPhoto(item)}
+                  >
+                    <span
+                      className="tp-polaroid"
+                      style={{
+                        '--tilt': item.tilt,
+                        '--tape': item.tape,
+                        '--i': idx,
+                      } as React.CSSProperties}
+                    >
+                      {/* Washi Tape */}
+                      {item.tapeType === 'center' && <span aria-hidden="true" className="tp-tape tp-tape--center" />}
+                      {item.tapeType === 'left' && <span aria-hidden="true" className="tp-tape tp-tape--left" />}
+                      {item.tapeType === 'right' && <span aria-hidden="true" className="tp-tape tp-tape--right" />}
+                      {item.tapeType === 'corners' && (
+                        <>
+                          <span aria-hidden="true" className="tp-tape tp-tape--tl" />
+                          <span aria-hidden="true" className="tp-tape tp-tape--tr" />
+                        </>
+                      )}
+
+                      {/* Polaroid Photo Frame */}
+                      <span className="tp-polaroid__photo">
+                        <img
+                          alt="A happy TeddyPups family with their new puppy"
+                          loading="lazy"
+                          width="433"
+                          height="433"
+                          decoding="async"
+                          style={{
+                            color: 'transparent',
+                            width: '100%',
+                            height: 'auto',
+                            backgroundColor: item.bgColor,
+                          }}
+                          src={item.image}
+                        />
+                      </span>
+
+                      {/* Polaroid Handwritten Caption */}
+                      <span className="tp-polaroid__caption font-scrawl">{item.caption}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Facade Ground with Door, Lamp, CTA, and Mascot */}
+            <div className="tp-facade__ground">
+              <span aria-hidden="true" className="tp-facade__door" />
+              <span aria-hidden="true" className="tp-lamp">
+                <span className="tp-lamp__light" />
               </span>
-              <h2 className="font-display font-extrabold text-3xl sm:text-5xl text-cream-light tracking-tight mt-1">
-                Happy families & puppies
-              </h2>
-              <p className="mt-2 font-sans text-base sm:text-lg text-cream/80 max-w-xl">
-                Heartwarming moments shared by our valued clients across Dubai and the Emirates.
+              <a className="btn btn-primary tp-facade__cta" href="/happy-families">
+                See every happy family
+              </a>
+              <div data-pup-stop="true" data-pose="sit" data-facing="right" className="pup-stop tp-dusk__teddy">
+                <PoodleMascot pose="sit" bubbleText="so happy! 🧸" />
+              </div>
+            </div>
+          </div>
+
+          {/* Cobblestone / Street Pavement Band */}
+          <div aria-hidden="true" className="tp-street__pavement" />
+        </div>
+
+        {/* Photo Viewer Modal Dialog */}
+        {selectedPhoto && (
+          <dialog
+            open
+            aria-label="Photo viewer"
+            className="fixed inset-0 z-50 flex items-center justify-center m-0 h-dvh max-h-none w-screen max-w-none bg-cocoa/95 p-4 text-milk backdrop:bg-cocoa/70 outline-none"
+            onClick={() => setSelectedPhoto(null)}
+          >
+            <div
+              className="relative max-w-xl w-full bg-cream rounded-3xl p-6 border-4 border-cocoa text-cocoa shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-cocoa text-cream flex items-center justify-center hover:scale-105 transition-transform"
+                onClick={() => setSelectedPhoto(null)}
+                aria-label="Close photo"
+              >
+                ✕
+              </button>
+              <div className="aspect-[4/4.6] w-full rounded-2xl overflow-hidden bg-cream-soft border-2 border-cocoa/20 mb-4">
+                <img
+                  src={selectedPhoto.image}
+                  alt={selectedPhoto.caption}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="font-scrawl text-xl text-center text-cocoa font-bold">
+                {selectedPhoto.caption}
               </p>
             </div>
-
-            <StickerButton
-              to="/happy-families"
-              variant="cream"
-              size="md"
-              icon={<ArrowRight className="w-4 h-4" />}
-            >
-              See every happy family
-            </StickerButton>
-          </div>
-
-          {/* Comic-Style Speech-Bubble Testimonial from Sarah M. */}
-          <div className="relative bg-cream-light text-espresso p-6 sm:p-8 rounded-3xl border-[1.5px] border-espresso-border shadow-lip-md max-w-3xl mx-auto mb-10 select-none">
-            {/* Speech bubble pointer arrow pointing down */}
-            <div className="absolute -bottom-2.5 left-16 w-5 h-5 bg-cream-light border-b-[1.5px] border-r-[1.5px] border-espresso-border rotate-45" />
-
-            <div className="flex items-start gap-3">
-              <Quote className="w-8 h-8 text-terracotta shrink-0 mt-0.5 opacity-80" />
-              <div>
-                <blockquote className="font-sans font-medium text-base sm:text-lg text-espresso leading-relaxed">
-                  "{FEATURED_TESTIMONIAL.quote}"
-                </blockquote>
-                <figcaption className="mt-3 font-script text-lg sm:text-xl text-terracotta-ink font-bold">
-                  — {FEATURED_TESTIMONIAL.clientName}, {FEATURED_TESTIMONIAL.location}
-                </figcaption>
-              </div>
-            </div>
-          </div>
-
-          {/* Wooden Shelf with Mascot Walking */}
-          <div className="relative w-full h-4 bg-wood rounded-full border border-espresso/40 my-4 shadow-sm flex items-center justify-between px-6">
-            <div className="absolute -top-16 right-16">
-              <PoodleMascot pose="side-walk" className="w-20 h-16" bubbleText="so happy! 🧸" />
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* LOWER GALLERY: Dark Brown Wooden Plank Wall (#3B241A) with Polaroids, Floor Lamp & Arched Door */}
-      <div
-        className="relative py-16 sm:py-24 bg-[#3B241A] text-cream-light border-b-[1.5px] border-espresso-border"
-        style={{
-          backgroundImage: `repeating-linear-gradient(
-            0deg,
-            transparent 0,
-            transparent 38px,
-            rgba(0, 0, 0, 0.2) 39px,
-            rgba(0, 0, 0, 0.35) 40px
-          )`
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="flex items-center justify-between gap-6">
-            
-            {/* Illustrated Floor Lamp on Left */}
-            <div className="hidden xl:flex flex-col items-center shrink-0 -mt-12 select-none">
-              {/* Glowing Lamp Shade */}
-              <div className="w-16 h-12 bg-honey-soft rounded-t-full border border-espresso shadow-[0_0_25px_rgba(242,190,107,0.5)] flex items-center justify-center">
-                <div className="w-4 h-4 rounded-full bg-honey" />
-              </div>
-              {/* Lamp Pole */}
-              <div className="w-1.5 h-64 bg-honey-deep border-x border-espresso/50" />
-              {/* Lamp Base */}
-              <div className="w-16 h-3 bg-wood rounded-full border border-espresso" />
-            </div>
-
-            {/* Polaroid Gallery Grid (2 Rows of Polaroids) */}
-            <div className="flex-1">
-              {/* Row 1 */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6 justify-items-center mb-6">
-                {HAPPY_FAMILIES.slice(0, 4).map((moment) => (
-                  <WashiTapePolaroid
-                    key={moment.id}
-                    image={moment.image}
-                    caption={moment.caption}
-                    clientName={moment.clientName}
-                    location={moment.location}
-                    washiColor={moment.washiColor}
-                    tiltDeg={moment.tiltDeg}
-                  />
-                ))}
-              </div>
-
-              {/* Row 2 */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6 justify-items-center">
-                {HAPPY_FAMILIES.slice(4, 8).map((moment) => (
-                  <WashiTapePolaroid
-                    key={moment.id}
-                    image={moment.image}
-                    caption={moment.caption}
-                    clientName={moment.clientName}
-                    location={moment.location}
-                    washiColor={moment.washiColor}
-                    tiltDeg={moment.tiltDeg}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Cozy Arched Wooden Door on Right */}
-            <div className="hidden xl:flex flex-col items-center shrink-0 select-none">
-              <div className="w-20 h-44 rounded-t-full border-2 border-espresso bg-wood relative shadow-lg overflow-hidden">
-                <div className="absolute top-1/2 right-2 w-2 h-2 rounded-full bg-honey border border-espresso" />
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-    </section>
+          </dialog>
+        )}
+      </section>
+    </div>
   );
 };

@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 export const PuppyPassportSection: React.FC = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [stamped, setStamped] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStamped(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div data-section="trust">
       <section
+        ref={sectionRef}
         data-pup-scene="true"
         data-tone="light"
         className="tp-scene tp-passport"
@@ -48,7 +67,7 @@ export const PuppyPassportSection: React.FC = () => {
                   '--i': 0
                 } as React.CSSProperties}
               >
-                <span className="tp-stamp tp-stamp--round">
+                <span className="tp-stamp tp-stamp--round" data-stamped={stamped ? 'true' : 'false'}>
                   <svg viewBox="0 0 64 64" className="tp-stamp__icon" aria-hidden="true">
                     <path
                       d="M32 54C16 43 8 34 8 24c0-7 5.4-12 12-12 5 0 9 3 12 7 3-4 7-7 12-7 6.6 0 12 5 12 12 0 10-8 19-24 30z"
@@ -83,7 +102,7 @@ export const PuppyPassportSection: React.FC = () => {
                   '--i': 1
                 } as React.CSSProperties}
               >
-                <span className="tp-stamp tp-stamp--ticket">
+                <span className="tp-stamp tp-stamp--ticket" data-stamped={stamped ? 'true' : 'false'}>
                   <svg viewBox="0 0 64 64" className="tp-stamp__icon" aria-hidden="true">
                     <path
                       d="M6 36l22-3 12-17h6l-6 17 12-1 6-7h3l-2 10 2 10h-3l-6-7-12-1 6 17h-6L28 37 6 36z"
@@ -119,7 +138,7 @@ export const PuppyPassportSection: React.FC = () => {
                   '--i': 2
                 } as React.CSSProperties}
               >
-                <span className="tp-stamp tp-stamp--oval">
+                <span className="tp-stamp tp-stamp--oval" data-stamped={stamped ? 'true' : 'false'}>
                   <svg viewBox="0 0 64 64" className="tp-stamp__icon" aria-hidden="true">
                     <path
                       d="M10 14h44v28H30l-12 10v-10h-8z"
@@ -154,7 +173,7 @@ export const PuppyPassportSection: React.FC = () => {
                   '--i': 3
                 } as React.CSSProperties}
               >
-                <span className="tp-stamp tp-stamp--scallop">
+                <span className="tp-stamp tp-stamp--scallop" data-stamped={stamped ? 'true' : 'false'}>
                   <svg viewBox="0 0 64 64" className="tp-stamp__icon" aria-hidden="true">
                     <circle
                       cx="32"
