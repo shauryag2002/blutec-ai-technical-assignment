@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 export const PuppyPassportSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -47,13 +46,12 @@ export const PuppyPassportSection: React.FC = () => {
                 Why families trust TeddyPups
               </h2>
               <div
+                id="pup-stop-trust"
                 data-pup-stop="true"
                 data-pose="sit"
                 data-facing="right"
                 className="pup-stop tp-book__teddy"
-              >
-                <PoodleMascot pose="sit" bubbleText="verified! 🐾" />
-              </div>
+              />
             </div>
 
             {/* Right Page: 4 Ink Stamps */}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PoodleMascot } from '../mascot/PoodleMascot';
 import { CONTACT_DETAILS } from '../../data/navigation';
 
 export const StarryFooter: React.FC = () => {
@@ -115,6 +114,7 @@ export const StarryFooter: React.FC = () => {
               <path d="M116 145 A96 12 0 0 1 308 145" className="tp-basket__rim" />
             </svg>
             <div
+              id="pup-stop-footer"
               data-pup-stop="true"
               data-pose="snug"
               data-facing="right"
@@ -122,9 +122,7 @@ export const StarryFooter: React.FC = () => {
               data-behind="true"
               data-lane="true"
               className="pup-stop tp-basket__pup"
-            >
-              <PoodleMascot pose="snug" className="w-full h-full" />
-            </div>
+            />
             <svg aria-hidden="true" viewBox="0 0 300 240" className="tp-basket__front">
               <path
                 d="M116 145 C118 180 126 214 138 232 L286 232 C298 214 306 180 308 145 A96 12 0 0 1 116 145 Z"

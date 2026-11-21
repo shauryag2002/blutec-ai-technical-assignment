@@ -230,7 +230,13 @@ export const HeroSection: React.FC = () => {
         {/* Center Mascot Anchor: Stop 1 for Global Puppy Actor */}
         <div
           id="pup-stop-hero"
-          className="absolute left-1/2 -translate-x-1/2 z-15 w-44 sm:w-56 h-36 sm:h-44 pointer-events-none"
+          data-pup-stop="true"
+          data-pose="peek"
+          data-facing="right"
+          data-act="peekaboo"
+          data-behind="true"
+          data-lane="true"
+          className="pup-stop tp-hero__teddy absolute left-1/2 -translate-x-1/2 z-15 w-44 sm:w-56 h-36 sm:h-44 pointer-events-none"
           style={{
             bottom: 'calc(clamp(4.5rem, 12vh, 8rem) - 0.8rem)'
           }}

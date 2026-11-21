@@ -1,5 +1,4 @@
 import React from 'react';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 interface StarProps {
   left: string;
@@ -74,14 +73,13 @@ export const QuestionsSection: React.FC = () => {
                 ?
               </span>
               <div
+                id="pup-stop-questions"
                 data-pup-stop="true"
                 data-pose="sit"
                 data-facing="right"
                 data-act="tilt"
                 className="pup-stop tp-night__teddy"
-              >
-                <PoodleMascot pose="sit" bubbleText="curious? 🐾" />
-              </div>
+              />
             </div>
           </div>
 

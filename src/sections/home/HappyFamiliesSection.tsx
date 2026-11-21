@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 interface PolaroidItem {
   id: number;
@@ -227,9 +226,13 @@ export const HappyFamiliesSection: React.FC = () => {
               <a className="btn btn-primary tp-facade__cta   px-7 py-3 text-base font-semibold shrink-0" href="/happy-families">
                 See every happy family
               </a>
-              <div data-pup-stop="true" data-pose="sit" data-facing="right" className="pup-stop tp-dusk__teddy">
-                <PoodleMascot pose="sit" bubbleText="so happy! 🧸" />
-              </div>
+              <div
+                id="pup-stop-families"
+                data-pup-stop="true"
+                data-pose="sit"
+                data-facing="right"
+                className="pup-stop tp-dusk__teddy"
+              />
             </div>
           </div>
 

@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useScroll } from 'framer-motion';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 export const TwoWaysSection: React.FC = () => {
   return (
@@ -94,9 +93,13 @@ export const TwoWaysSection: React.FC = () => {
             </article>
 
             {/* Central Mascot Anchor at the signpost base */}
-            <div data-pup-stop="true" data-pose="sit" data-facing="right" className="pup-stop tp-fork__teddy">
-              <PoodleMascot pose="sit" bubbleText="which way? 🐾" />
-            </div>
+            <div
+              id="pup-stop-paths"
+              data-pup-stop="true"
+              data-pose="sit"
+              data-facing="right"
+              className="pup-stop tp-fork__teddy"
+            />
           </div>
         </div>
       </section>

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 const STEPS = [
   {
@@ -24,7 +23,6 @@ export const PuppyJourneySection: React.FC = () => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
-  const [mascotBubble, setMascotBubble] = useState<string | undefined>(undefined);
 
   const stepsRef = useRef<HTMLOListElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -61,13 +59,7 @@ export const PuppyJourneySection: React.FC = () => {
     setIsTyping(true);
     const timer = setTimeout(() => {
       setIsTyping(false);
-      if (activeStep === 1) {
-        setMascotBubble('ooh, photos! 📸');
-      } else if (activeStep === 2) {
-        setMascotBubble('home soon! ❤️');
-      } else {
-        setMascotBubble(undefined);
-      }
+      // typing finished
     }, 700);
 
     return () => clearTimeout(timer);
@@ -324,9 +316,13 @@ export const PuppyJourneySection: React.FC = () => {
             </div>
 
             {/* Mascot Beside Phone */}
-            <div data-pup-stop="true" data-pose="sit" data-facing="right" className="pup-stop tp-chat__teddy">
-              <PoodleMascot pose="sit" bubbleText={mascotBubble} />
-            </div>
+            <div
+              id="pup-stop-journey"
+              data-pup-stop="true"
+              data-pose="sit"
+              data-facing="right"
+              className="pup-stop tp-chat__teddy"
+            />
           </div>
         </div>
       </section>

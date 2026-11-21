@@ -373,7 +373,7 @@ body {
 .tp-door {
   list-style: none;
   position: relative;
-  width: var(--door-w, 244px);
+  width: 100%;
 }
 
 .tp-meet[data-pinned] .tp-door {

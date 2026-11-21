@@ -1,20 +1,37 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { PoodleMascot, type PoodlePose } from './PoodleMascot';
 
+const STOP_CONFIGS: { id: string; defaultPose: PoodlePose; facing: 'left' | 'right'; act?: string; behind?: boolean }[] = [
+  { id: 'pup-stop-hero', defaultPose: 'peek', facing: 'right', act: 'peekaboo', behind: true },
+  { id: 'pup-stop-meet', defaultPose: 'side-walk', facing: 'right', act: 'treadmill' },
+  { id: 'pup-stop-paths', defaultPose: 'sit', facing: 'right' },
+  { id: 'pup-stop-journey', defaultPose: 'sit', facing: 'right' },
+  { id: 'pup-stop-trust', defaultPose: 'sit', facing: 'right' },
+  { id: 'pup-stop-families', defaultPose: 'sit', facing: 'right' },
+  { id: 'pup-stop-questions', defaultPose: 'sit', facing: 'right', act: 'tilt' },
+  { id: 'pup-stop-cta', defaultPose: 'bow', facing: 'right' },
+  { id: 'pup-stop-footer', defaultPose: 'snug', facing: 'right', act: 'basket', behind: true }
+];
+
 /**
- * GlobalPuppyActor Component
+ * GlobalPuppyActor Component (Single Travelling Actor)
  * 
- * 1. Hero Stage (scrollY <= 80px):
- *    - Teddy peeks over the quilt in Hero.
- *    - No footprints; footprints container hidden.
- * 2. Moving to Next Section (80px < scrollY < 650px):
- *    - Teddy steps down and walks smoothly toward Meet The Pups.
- *    - Stamps authentic puppy footprints along its exact walking trajectory!
- * 3. Arrived at Footpath (scrollY >= 650px):
- *    - Once Teddy arrives on the footpath of the next section, ALL footprints are immediately removed.
- *    - Footprints container hidden so sky in Meet The Pups stays completely clean.
- * 4. Fast scroll protection:
- *    - Immediate container hide (display: 'none') + clear ensures zero ghost footprints.
+ * Replicates the PupJourney architecture from https://puppy.instabizweb.com/:
+ * 1. Only ONE puppy actor travels continuously between stops across all sections.
+ * 2. In Hero Stage (scrollY <= 80px):
+ *    - Teddy peeks over the quilt blanket.
+ *    - Footprints layer is hidden and clear.
+ * 3. Moving to Next Section (Hero -> Meet The Pups footpath):
+ *    - Teddy steps down and walks toward Meet The Pups.
+ *    - Stamps authentic puppy footprints along its exact walking trajectory.
+ * 4. Arrived at Next Section (scrollY >= meetArrival):
+ *    - Once Teddy lands on the footpath in Meet The Pups, ALL footprints are immediately cleared.
+ *    - Footprints layer hidden so sky and cards stay 100% clean.
+ * 5. Fast Scroll Protection:
+ *    - Instant clear on scroll threshold prevents ghost or stuck footprints.
+ * 6. Responsive:
+ *    - On desktop: travels through all stops down to the starry night woven basket.
+ *    - On mobile: lane-aware edge docking and basket snuggle.
  */
 export const GlobalPuppyActor: React.FC = () => {
   const [pupState, setPupState] = useState<{
@@ -67,21 +84,53 @@ export const GlobalPuppyActor: React.FC = () => {
     let animId = 0;
 
     const updatePupPosition = () => {
-      const heroStop = document.getElementById('pup-stop-hero');
-      const meetStop = document.getElementById('pup-stop-meet');
+      const scrollY = window.scrollY;
+      const isMobile = window.innerWidth < 768;
 
-      if (!heroStop) {
+      // 1. Locate all available stop elements in the DOM
+      const activeStops: {
+        config: typeof STOP_CONFIGS[0];
+        el: HTMLElement;
+        docX: number;
+        docY: number;
+        rect: DOMRect;
+        scale: number;
+      }[] = [];
+
+      for (const cfg of STOP_CONFIGS) {
+        const el = document.getElementById(cfg.id);
+        if (el && el.offsetParent !== null) {
+          const rect = el.getBoundingClientRect();
+          const docX = rect.left + rect.width / 2;
+          const docY = rect.top + scrollY + rect.height / 2;
+          const scale = cfg.id === 'pup-stop-hero' ? 1.15 :
+                        cfg.id === 'pup-stop-meet' ? 0.78 :
+                        cfg.id === 'pup-stop-footer' ? 0.85 :
+                        Math.min(1.05, Math.max(0.72, rect.width / 240));
+
+          activeStops.push({
+            config: cfg,
+            el,
+            docX,
+            docY,
+            rect,
+            scale
+          });
+        }
+      }
+
+      if (activeStops.length === 0) {
         setPupState(prev => ({ ...prev, visible: false }));
         return;
       }
 
-      const heroRect = heroStop.getBoundingClientRect();
-      const scrollY = window.scrollY;
+      const heroStop = activeStops.find(s => s.config.id === 'pup-stop-hero');
+      const meetStop = activeStops.find(s => s.config.id === 'pup-stop-meet');
 
-      // 1. Hero Stage: scrollY <= 80px (Peeking on quilt, no footprints)
-      if (scrollY <= 80 || !meetStop) {
+      // 2. HERO STAGE (scrollY <= 80px)
+      if (scrollY <= 80 && heroStop) {
         clearAllFootprints();
-
+        const heroRect = heroStop.el.getBoundingClientRect();
         setPupState({
           visible: true,
           x: heroRect.left + heroRect.width / 2 - 150,
@@ -93,46 +142,190 @@ export const GlobalPuppyActor: React.FC = () => {
         return;
       }
 
-      const meetRect = meetStop.getBoundingClientRect();
+      // Calculate arrival scroll for Meet The Pups footpath
+      let meetArrivalScroll = 620;
+      if (meetStop) {
+        const meetDocTop = meetStop.docY - meetStop.rect.height / 2;
+        meetArrivalScroll = Math.max(480, Math.min(750, meetDocTop - window.innerHeight * 0.55));
+      }
 
-      // 2. Arrived at next section (Meet The Pups footpath: scrollY >= 650px)
-      // When puppy arrives on footpath, remove all footprints and hide layer!
-      if (scrollY >= 650) {
-        clearAllFootprints();
+      // 3. TRANSITION FROM HERO TO MEET THE PUPS (80px < scrollY < meetArrivalScroll)
+      if (scrollY < meetArrivalScroll && heroStop && meetStop) {
+        if (printsContainerRef.current) {
+          printsContainerRef.current.style.display = 'block';
+        }
+
+        const t = Math.min(Math.max((scrollY - 80) / (meetArrivalScroll - 80), 0), 1);
+        const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+        // Curved arc from Quilt down to Footpath
+        const pupDocX = heroStop.docX + (meetStop.docX - heroStop.docX) * ease;
+        const pupDocY = heroStop.docY + (meetStop.docY - heroStop.docY) * ease;
+
+        const currentX = pupDocX - 150;
+        const currentY = pupDocY - scrollY - 120;
+        const currentScale = 1.15 + (meetStop.scale - 1.15) * ease;
+        const currentPose: PoodlePose = t > 0.12 ? 'side-walk' : 'peek';
 
         setPupState({
           visible: true,
-          x: meetRect.left + meetRect.width / 2 - 150,
-          y: meetRect.top + meetRect.height / 2 - 120,
-          scale: 0.78,
-          pose: 'side-walk',
+          x: currentX,
+          y: currentY,
+          scale: currentScale,
+          pose: currentPose,
+          bubbleText: undefined
+        });
+
+        // Stamp footprints along walking path
+        if (currentPose === 'side-walk') {
+          const footXDoc = pupDocX;
+          const footYDoc = pupDocY + 70 * currentScale;
+
+          if (!lastStepRef.current) {
+            lastStepRef.current = { x: footXDoc, y: footYDoc };
+          } else {
+            const dx = footXDoc - lastStepRef.current.x;
+            const dy = footYDoc - lastStepRef.current.y;
+            const dist = Math.hypot(dx, dy);
+
+            // Stamp every ~28px of travel
+            if (dist >= 28) {
+              stepCountRef.current++;
+              const n = stepCountRef.current % 2;
+              const angle = Math.atan2(dy, dx) + Math.PI / 2;
+
+              // Left/Right foot alternation
+              const normX = -dy / dist;
+              const normY = dx / dist;
+              const sideOffset = (n === 0 ? 1 : -1) * 8 * currentScale;
+              const pawX = footXDoc + normX * sideOffset;
+              const pawY = footYDoc + normY * sideOffset;
+
+              const pool = printsPoolRef.current;
+              if (pool.length > 0) {
+                const svg = pool[printIndexRef.current % pool.length];
+                printIndexRef.current++;
+                if (svg) {
+                  const sz = 16 * Math.max(0.75, currentScale);
+                  svg.style.transform = `translate3d(${(pawX - sz / 2).toFixed(1)}px, ${(pawY - sz / 2).toFixed(1)}px, 0px) rotate(${angle.toFixed(3)}rad)`;
+                  svg.style.width = `${sz.toFixed(1)}px`;
+                  svg.style.height = `${sz.toFixed(1)}px`;
+                  svg.style.opacity = '0.65';
+                  svg.animate([
+                    { opacity: 0 },
+                    { opacity: 0.65, offset: 0.1 },
+                    { opacity: 0.65, offset: 0.75 },
+                    { opacity: 0 }
+                  ], {
+                    duration: 2500,
+                    easing: 'ease-out'
+                  });
+                }
+              }
+
+              lastStepRef.current = { x: footXDoc, y: footYDoc };
+            }
+          }
+        }
+        return;
+      }
+
+      // 4. ARRIVED AT / PAST FOOTPATH: CLEAR ALL FOOTPRINTS
+      clearAllFootprints();
+
+      // On mobile without desktop treadmill pinned track:
+      if (isMobile) {
+        // Dock to footer basket when near footer
+        const footerStop = activeStops.find(s => s.config.id === 'pup-stop-footer');
+        if (footerStop && footerStop.rect.top < window.innerHeight * 0.8) {
+          const rect = footerStop.rect;
+          setPupState({
+            visible: true,
+            x: rect.left + rect.width / 2 - 150,
+            y: rect.top + rect.height / 2 - 120,
+            scale: 0.85,
+            pose: 'snug',
+            bubbleText: undefined
+          });
+          return;
+        }
+
+        // Side lane edge peeking on mobile matching reference site:
+        // Alternates left and right screen margin so cards and buttons remain unobstructed
+        const sceneIndex = Math.floor(scrollY / (window.innerHeight * 0.75));
+        const isLeft = sceneIndex % 2 === 0;
+        const peekScale = 0.46;
+        const peekX = isLeft ? -132 : (window.innerWidth - 42);
+        const peekY = window.innerHeight * 0.45;
+
+        setPupState({
+          visible: true,
+          x: peekX,
+          y: peekY,
+          scale: peekScale,
+          pose: 'peek',
           bubbleText: undefined
         });
         return;
       }
 
-      // 3. Going to next section: 80px < scrollY < 650px
-      // Show prints container and stamp footprints along the trail
-      if (printsContainerRef.current) {
-        printsContainerRef.current.style.display = 'block';
+      // 5. DESKTOP MULTI-STOP TRAVELER (Meet -> Paths -> Journey -> Trust -> Families -> Questions -> CTA -> Footer)
+      // Find the pair of stops that bracket the current scrollY
+      // A stop is "in focus" when its document top is roughly in the viewport center
+      const viewportMidY = scrollY + window.innerHeight * 0.5;
+
+      // Find closest stops
+      let currStopIdx = 1; // Start at Meet The Pups
+      for (let i = 1; i < activeStops.length; i++) {
+        if (activeStops[i].docY <= viewportMidY) {
+          currStopIdx = i;
+        } else {
+          break;
+        }
       }
 
-      const t = Math.min(Math.max((scrollY - 80) / 520, 0), 1);
+      const fromStop = activeStops[currStopIdx];
+      const toStop = activeStops[currStopIdx + 1];
+
+      if (!toStop) {
+        // We are at the final stop (Starry Footer Woven Basket)
+        const rect = fromStop.el.getBoundingClientRect();
+        setPupState({
+          visible: true,
+          x: rect.left + rect.width / 2 - 150,
+          y: rect.top + rect.height / 2 - 120,
+          scale: fromStop.scale,
+          pose: fromStop.config.defaultPose,
+          bubbleText: undefined
+        });
+        return;
+      }
+
+      // Interpolate between fromStop and toStop
+      const dist = Math.max(1, toStop.docY - fromStop.docY);
+      const rawT = (viewportMidY - fromStop.docY) / dist;
+      const t = Math.min(Math.max(rawT, 0), 1);
       const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
-      // Document positions for stable, non-jumping coordinates
-      const heroDocX = heroRect.left + heroRect.width / 2;
-      const heroDocY = heroRect.top + scrollY + heroRect.height / 2;
-      const meetDocX = meetRect.left + meetRect.width / 2;
-      const meetDocY = meetRect.top + scrollY + meetRect.height / 2;
+      // Check if holding stationary at a stop
+      const isHoldingFrom = t < 0.15;
+      const isHoldingTo = t > 0.85;
 
-      const pupDocX = heroDocX + (meetDocX - heroDocX) * ease;
-      const pupDocY = heroDocY + (meetDocY - heroDocY) * ease;
+      const pupDocX = fromStop.docX + (toStop.docX - fromStop.docX) * ease;
+      const pupDocY = fromStop.docY + (toStop.docY - fromStop.docY) * ease;
 
       const currentX = pupDocX - 150;
       const currentY = pupDocY - scrollY - 120;
-      const currentScale = 1.15 + (0.78 - 1.15) * ease;
-      const currentPose: PoodlePose = t > 0.12 ? 'side-walk' : 'peek';
+      const currentScale = fromStop.scale + (toStop.scale - fromStop.scale) * ease;
+
+      let currentPose: PoodlePose;
+      if (isHoldingFrom) {
+        currentPose = fromStop.config.defaultPose;
+      } else if (isHoldingTo) {
+        currentPose = toStop.config.defaultPose;
+      } else {
+        currentPose = 'side-walk';
+      }
 
       setPupState({
         visible: true,
@@ -142,58 +335,6 @@ export const GlobalPuppyActor: React.FC = () => {
         pose: currentPose,
         bubbleText: undefined
       });
-
-      // Stamp footprints while walking between sections
-      if (currentPose === 'side-walk') {
-        const footXDoc = pupDocX;
-        const footYDoc = pupDocY + 70 * currentScale;
-
-        if (!lastStepRef.current) {
-          lastStepRef.current = { x: footXDoc, y: footYDoc };
-        } else {
-          const dx = footXDoc - lastStepRef.current.x;
-          const dy = footYDoc - lastStepRef.current.y;
-          const dist = Math.hypot(dx, dy);
-
-          // Stamp every ~28px of travel
-          if (dist >= 28) {
-            stepCountRef.current++;
-            const n = stepCountRef.current % 2;
-            const angle = Math.atan2(dy, dx) + Math.PI / 2;
-
-            // Lateral offset for left vs right foot alternation
-            const normX = -dy / dist;
-            const normY = dx / dist;
-            const sideOffset = (n === 0 ? 1 : -1) * 8 * currentScale;
-            const pawX = footXDoc + normX * sideOffset;
-            const pawY = footYDoc + normY * sideOffset;
-
-            const pool = printsPoolRef.current;
-            if (pool.length > 0) {
-              const svg = pool[printIndexRef.current % pool.length];
-              printIndexRef.current++;
-              if (svg) {
-                const sz = 16 * Math.max(0.75, currentScale);
-                svg.style.transform = `translate3d(${(pawX - sz / 2).toFixed(1)}px, ${(pawY - sz / 2).toFixed(1)}px, 0px) rotate(${angle.toFixed(3)}rad)`;
-                svg.style.width = `${sz.toFixed(1)}px`;
-                svg.style.height = `${sz.toFixed(1)}px`;
-                svg.style.opacity = '0.65';
-                svg.animate([
-                  { opacity: 0 },
-                  { opacity: 0.65, offset: 0.1 },
-                  { opacity: 0.65, offset: 0.75 },
-                  { opacity: 0 }
-                ], {
-                  duration: 2500,
-                  easing: 'ease-out'
-                });
-              }
-            }
-
-            lastStepRef.current = { x: footXDoc, y: footYDoc };
-          }
-        }
-      }
     };
 
     const handleScroll = () => {
@@ -214,7 +355,7 @@ export const GlobalPuppyActor: React.FC = () => {
 
   return (
     <>
-      {/* Absolute Document Footprints Layer (renders footprints along transition path) */}
+      {/* Absolute Document Footprints Layer (renders footprints along Hero -> Meet path) */}
       <div
         ref={printsContainerRef}
         aria-hidden="true"

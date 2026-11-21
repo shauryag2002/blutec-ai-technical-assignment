@@ -56,7 +56,7 @@ export const MeetThePupsSection: React.FC = () => {
           '--sky-bottom': '#fbe3b4'
         } as React.CSSProperties}
         aria-labelledby="meet-title"
-        data-pinned="true"
+        data-pinned={isDesktop ? 'true' : undefined}
       >
         <div
           ref={targetRef}
@@ -136,34 +136,39 @@ export const MeetThePupsSection: React.FC = () => {
                 />
               </div>
             ) : (
-              /* MOBILE SNAP-X LIST */
-              <div className="mt-8 px-4">
-                <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-none">
+              /* MOBILE RESPONSIVE GRID MATCHING LIVE SITE */
+              <div className="tp-meet__hall mt-6">
+                <ol className="tp-meet__track" data-treadmill="true" aria-label="Puppies looking for a family">
                   {featuredPuppies.map((puppy, idx) => (
-                    <div key={puppy.id} className="shrink-0 snap-center">
-                      <PuppyDoorCard
-                        puppy={puppy}
-                        doorColor={DOOR_WOOD_COLORS[idx % DOOR_WOOD_COLORS.length]}
-                        isOpenControlled={mobileOpenSlug === puppy.slug}
-                        onToggleOpen={() =>
-                          setMobileOpenSlug((prev) => (prev === puppy.slug ? null : puppy.slug))
-                        }
-                      />
-                    </div>
+                    <PuppyDoorCard
+                      key={puppy.id}
+                      puppy={puppy}
+                      doorColor={DOOR_WOOD_COLORS[idx % DOOR_WOOD_COLORS.length]}
+                      isOpenControlled={mobileOpenSlug === puppy.slug}
+                      onToggleOpen={() =>
+                        setMobileOpenSlug((prev) => (prev === puppy.slug ? null : puppy.slug))
+                      }
+                    />
                   ))}
 
-                  <div className="shrink-0 snap-center flex items-end">
-                    <li className="tp-door tp-door--all" data-open="true">
-                      <Link to="/puppies" className="tp-door__link block group w-52 aspect-[4/5.2]">
-                        <span className="tp-door__frame tp-door__frame--all w-full h-full">
-                          <span className="font-plush tp-door__all">
-                            Meet<br />them all
-                          </span>
+                  <li className="tp-door tp-door--all" data-open="true">
+                    <Link to="/puppies" className="tp-door__link block group">
+                      <span className="tp-door__frame tp-door__frame--all">
+                        <span className="font-plush tp-door__all">
+                          Meet<br />them all
                         </span>
-                      </Link>
-                    </li>
-                  </div>
-                </div>
+                      </span>
+                    </Link>
+                  </li>
+                </ol>
+                <div
+                  id="pup-stop-meet"
+                  data-pup-stop="true"
+                  data-pose="walk"
+                  data-facing="right"
+                  className="pup-stop tp-meet__teddy hidden"
+                  data-act="treadmill"
+                />
               </div>
             )}
           </div>

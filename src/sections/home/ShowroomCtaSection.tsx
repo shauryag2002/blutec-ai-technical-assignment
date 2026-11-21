@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PoodleMascot } from '../../components/mascot/PoodleMascot';
 
 export const ShowroomCtaSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -86,9 +85,13 @@ export const ShowroomCtaSection: React.FC = () => {
           <span aria-hidden="true" className="tp-house__mat font-scrawl">
             welcome home
           </span>
-          <div data-pup-stop="true" data-pose="bow" data-facing="right" className="pup-stop tp-house__teddy">
-            <PoodleMascot pose="bow" />
-          </div>
+          <div
+            id="pup-stop-cta"
+            data-pup-stop="true"
+            data-pose="bow"
+            data-facing="right"
+            className="pup-stop tp-house__teddy"
+          />
         </div>
 
         {/* Action Buttons */}
