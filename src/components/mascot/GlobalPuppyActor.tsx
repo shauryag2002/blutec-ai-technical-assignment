@@ -126,6 +126,13 @@ export const GlobalPuppyActor: React.FC = () => {
   useEffect(() => {
     let animId = 0;
 
+    // The roving desktop puppy ONLY runs on desktop (>= 768px)
+    if (window.innerWidth < 768) {
+      clearAllFootprints();
+      delete document.documentElement.dataset.pup;
+      return;
+    }
+
     const updatePupPosition = () => {
       const scrollY = window.scrollY;
       const isMobile = window.innerWidth < 768;
@@ -428,6 +435,8 @@ export const GlobalPuppyActor: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
       cancelAnimationFrame(animId);
+      clearAllFootprints();
+      delete document.documentElement.dataset.pup;
     };
   }, []);
 

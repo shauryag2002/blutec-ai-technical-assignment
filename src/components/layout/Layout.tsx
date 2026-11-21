@@ -1,10 +1,11 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { StarryFooter } from './StarryFooter';
 import { RouteTransition } from './RouteTransition';
 import { PawTrailCanvas } from '../cursor/PawTrailCanvas';
 import { GlobalPuppyActor } from '../mascot/GlobalPuppyActor';
+import { MobileStickyPup } from '../mascot/MobileStickyPup';
 import { useRouteTransition } from '../../hooks/useRouteTransition';
 import { CONTACT_DETAILS } from '../../data/navigation';
 
@@ -21,6 +22,8 @@ import { CONTACT_DETAILS } from '../../data/navigation';
  */
 export const Layout: React.FC = () => {
   const { curtainState } = useRouteTransition();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-espresso selection:bg-honey selection:text-espresso relative">
@@ -40,6 +43,9 @@ export const Layout: React.FC = () => {
         data-whatsapp-bar="true"
         className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-cocoa bg-milk px-3 pb-[calc(0.6rem+env(safe-area-inset-bottom))] pt-2.5 md:hidden"
       >
+        {/* Puppy sitting on sticky bar on mobile */}
+        {isHome && <MobileStickyPup />}
+
         <div className="mx-auto flex max-w-md gap-2">
           <a
             href={CONTACT_DETAILS.whatsappUrl}
@@ -58,8 +64,8 @@ export const Layout: React.FC = () => {
         </div>
       </div>
 
-      {/* Global Interactive Puppy Actor (Teddy) traveling between sections */}
-      <GlobalPuppyActor />
+      {/* Global Interactive Puppy Actor (Teddy) traveling between sections on Homepage */}
+      {isHome && <GlobalPuppyActor />}
 
       {/* Scalloped Curtain Preloader & Route Transition */}
       <RouteTransition curtainState={curtainState} />
