@@ -22,6 +22,22 @@
   --color-honey-tan: #E7C592;
   --color-sky: #BFDDF5;
   --color-sky-deep: #2F6E9E;
+  --color-blush: #F9CDBF;
+  --color-cocoa: #2A170E;
+  --color-cocoa-soft: #5A3A28;
+  --color-toffee-deep: #A24A1A;
+  --color-toffee: #C2622B;
+  --color-toffee-ink: #8E3F15;
+  --color-milk: #FFFDF8;
+
+  --ink: var(--color-cocoa);
+  --ink-soft: var(--color-cocoa-soft);
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+  --header-h: 4.75rem;
+  --quilt-h: clamp(4.5rem, 12vh, 8rem);
+  --floor-h: clamp(5rem, 13vh, 8rem);
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-hand: 'Shantell Sans', 'Shantell Sans Fallback', cursive;
 
   /* Refined Storybook Bottom-Lip Shadows (Soft Craft Aesthetic) */
   --shadow-lip-sm: 0 2px 0 #23170F;
@@ -32,6 +48,7 @@
   /* Animation Easings */
   --ease-pounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
 }
 
 /* Headings: Soft Rounded Fraunces Serifs with Ball Terminals */
@@ -213,4 +230,305 @@ body {
 /* Horizontal marquee pause on hover */
 .marquee-container:hover .marquee-track {
   animation-play-state: paused;
+}
+
+/* ============================================================
+   Exact TeddyPups Reference Components & Utilities
+   ============================================================ */
+
+.gutter {
+  padding-inline: var(--gutter);
+}
+
+.font-plush {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  line-height: 0.92;
+}
+
+.font-scrawl {
+  font-family: var(--font-hand);
+  font-variation-settings: "INFM" 60, "BNCE" 30;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
+.font-plush-text {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 36;
+}
+
+.tp-scene {
+  --ink: var(--color-cocoa);
+  --ink-soft: var(--color-cocoa-soft);
+  color: var(--ink);
+  background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+  position: relative;
+}
+
+/* --- TP-MEET SECTION --- */
+.tp-meet__stage {
+  padding-top: clamp(4rem, 9vh, 7rem);
+  padding-bottom: clamp(3rem, 7vh, 5rem);
+  position: relative;
+}
+
+.tp-meet__head {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.25rem 2rem;
+  width: 100%;
+  max-width: 110rem;
+  margin-inline: auto;
+  display: flex;
+}
+
+.tp-meet__hall {
+  --floor-h: clamp(5rem, 13vh, 8rem);
+  margin-top: clamp(2rem, 5vh, 3.5rem);
+  position: relative;
+}
+
+.tp-meet__track {
+  padding-inline: var(--gutter);
+  grid-template-columns: repeat(auto-fill, minmax(min(10.5rem, 42vw), 1fr));
+  gap: 2.75rem 1.25rem;
+  max-width: 110rem;
+  margin-inline: auto;
+  display: grid;
+}
+
+.tp-meet__floor {
+  display: none;
+}
+
+.tp-meet__teddy {
+  right: var(--gutter);
+  width: clamp(8rem, 26vw, 11rem);
+  position: absolute;
+  top: clamp(-9.5rem, -20vw, -6rem);
+}
+
+.tp-meet[data-pinned] .tp-meet__stage {
+  height: 100vh;
+  padding-top: calc(var(--header-h) + clamp(1rem, 3vh, 2.5rem));
+  flex-direction: column;
+  padding-bottom: 0;
+  display: flex;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+}
+
+.tp-meet[data-pinned] .tp-meet__hall {
+  flex: 1;
+}
+
+.tp-meet[data-pinned] .tp-meet__track {
+  left: 0;
+  bottom: var(--floor-h);
+  align-items: flex-end;
+  gap: clamp(4.5rem, 6vw, 7rem);
+  width: max-content;
+  max-width: none;
+  padding-inline: 38vw 12vw;
+  display: flex;
+  position: absolute;
+}
+
+.tp-meet[data-pinned] .tp-meet__floor {
+  height: var(--floor-h);
+  border-top: 3px solid var(--color-cocoa);
+  background: linear-gradient(to bottom, #2a170e29, transparent 22%), repeating-linear-gradient(90deg, transparent 0 calc(11rem - 2px), #2a170e1f calc(11rem - 2px) 11rem) var(--floor-x, 0) 0 / auto, linear-gradient(#e8b06a, #dc9a52);
+  display: block;
+  position: absolute;
+  inset: auto 0 0;
+  box-shadow: 0 -12px 0 -6px #f5d9a8;
+}
+
+.tp-meet[data-pinned] .tp-meet__teddy {
+  aspect-ratio: 300 / 240;
+  top: auto;
+  left: 14vw;
+  right: auto;
+  bottom: calc(var(--floor-h) * .42);
+  width: clamp(11rem, min(14vw, 24vh), 14rem);
+}
+
+/* --- TP-DOOR COMPONENT --- */
+.tp-door {
+  list-style: none;
+  position: relative;
+  width: var(--door-w, 244px);
+}
+
+.tp-meet[data-pinned] .tp-door {
+  width: var(--door-w, clamp(8rem, min(15vw, 24vh), 16rem));
+}
+
+.tp-door__link {
+  border-radius: 1rem;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+
+.tp-door__plate {
+  text-align: center;
+  margin-bottom: .8rem;
+  display: block;
+}
+
+.tp-door__name {
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  line-height: 1;
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-cocoa);
+}
+
+.tp-door__meta {
+  color: var(--ink-soft);
+  margin-top: .35rem;
+  font-size: .9rem;
+  font-weight: 600;
+  display: block;
+}
+
+.tp-door__frame {
+  aspect-ratio: 4/5.2;
+  border: 3px solid var(--color-cocoa);
+  background: #3b2215;
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  display: block;
+  position: relative;
+}
+
+.tp-door__way {
+  --door-open: 78deg;
+  perspective: 700px;
+  perspective-origin: 0;
+  border-radius: 999px 999px 0 0;
+  position: absolute;
+  inset: -3px -3px 0;
+  overflow: hidden;
+}
+
+.tp-door__room {
+  border-radius: inherit;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.tp-door__room img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .45s var(--ease-silk);
+}
+
+.tp-door__leaf {
+  border: 3px solid var(--color-cocoa);
+  background: repeating-linear-gradient(90deg, transparent 0 calc(25% - 1.5px), #2a170e2e calc(25% - 1.5px) 25%), var(--door, #9E4B2E);
+  transform-origin: 0;
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  transition: transform 1.05s cubic-bezier(.3, 1.32, .48, 1) 50ms;
+  position: absolute;
+  inset: 0;
+}
+
+.tp-door__leaf:before {
+  content: "";
+  border: 2.5px solid #fffdf847;
+  border-radius: 999px 999px .5rem .5rem;
+  position: absolute;
+  inset: 12% 14% 9%;
+}
+
+.tp-door__peephole {
+  color: #fffdf873;
+  width: 22%;
+  position: absolute;
+  top: 19%;
+  left: 50%;
+  translate: -50%;
+}
+
+.tp-door__knob {
+  aspect-ratio: 1;
+  border: 2.5px solid var(--color-cocoa);
+  background: var(--color-honey);
+  border-radius: 50%;
+  width: .85rem;
+  position: absolute;
+  top: 56%;
+  right: 11%;
+}
+
+.tp-door[data-open="true"] .tp-door__leaf {
+  transform: rotateY(var(--door-open));
+}
+
+.tp-door[data-open="true"] .tp-door__room img {
+  transform: scale(1.04);
+}
+
+.tp-door__tag {
+  z-index: 2;
+  border: 2px solid var(--color-cocoa);
+  background: var(--color-milk);
+  color: var(--color-cocoa);
+  border-radius: 999px;
+  padding: .05rem .65rem .15rem;
+  font-size: .9rem;
+  position: absolute;
+  top: 16%;
+  right: -.7rem;
+  rotate: 7deg;
+  box-shadow: 2px 3px #2a170e33;
+}
+
+.tp-door__link:is(:hover, :focus-visible) .tp-door__leaf {
+  transform: rotateY(var(--door-open));
+}
+
+.tp-door__link:is(:hover, :focus-visible) .tp-door__name {
+  color: var(--color-toffee-deep);
+}
+
+.tp-door--all {
+  align-self: stretch;
+  align-items: flex-end;
+  display: flex;
+}
+
+.tp-door--all .tp-door__link {
+  width: 100%;
+}
+
+.tp-door__frame--all {
+  background: transparent !important;
+  border-style: dashed !important;
+  place-items: center;
+  display: grid;
+  transition: border-color 0.25s;
+}
+
+.tp-door__all {
+  text-align: center;
+  text-decoration: underline;
+  text-decoration-color: var(--color-toffee);
+  text-underline-offset: .18em;
+  padding: 1rem;
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  line-height: 1;
+  text-decoration-thickness: .08em;
+  color: var(--color-cocoa);
 }

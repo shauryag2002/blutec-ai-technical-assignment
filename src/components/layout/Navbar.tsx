@@ -52,18 +52,16 @@ export const Navbar: React.FC = () => {
     <header
       data-scrolled={scrolled ? 'true' : 'false'}
       data-hidden={hidden ? 'true' : 'false'}
-      className={`fixed top-0 inset-x-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.3,1,0.4,1)] select-none ${
-        hidden ? '-translate-y-[120%]' : 'translate-y-0'
-      }`}
+      className={`fixed top-0 inset-x-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.3,1,0.4,1)] select-none ${hidden ? '-translate-y-[120%]' : 'translate-y-0'
+        }`}
     >
       {/* Background fill that fades in when scrolled */}
       <div
-        className={`absolute inset-0 bg-[#FDF6EC] border-b border-espresso-border/10 transition-opacity duration-350 pointer-events-none ${
-          scrolled ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute inset-0 bg-white border-b border-espresso-border/10 transition-opacity duration-350 pointer-events-none ${scrolled ? 'opacity-100' : 'opacity-0'
+          }`}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 relative z-10">
         <div className="flex items-center justify-between h-20">
 
           {/* Brand Logo & Clean "TeddyPups" Wordmark */}
@@ -85,8 +83,7 @@ export const Navbar: React.FC = () => {
                 key={link.href}
                 to={link.href}
                 className={({ isActive }) =>
-                  `relative flex flex-col items-center py-2 text-sm font-sans font-semibold transition-colors ${
-                    isActive ? 'text-terracotta' : 'text-espresso-soft hover:text-terracotta'
+                  `relative flex flex-col items-center py-2 text-sm font-sans font-semibold transition-colors ${isActive ? 'text-terracotta' : 'text-espresso-soft hover:text-terracotta'
                   }`
                 }
               >
@@ -114,7 +111,6 @@ export const Navbar: React.FC = () => {
               rel="noopener noreferrer"
               className="btn-whatsapp px-5 py-2.5 text-sm gap-2"
             >
-              <MessageCircle className="w-4 h-4 fill-current" />
               <span>WhatsApp us</span>
             </a>
           </div>
@@ -124,57 +120,57 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl border-[1.5px] border-espresso-border bg-cream-light shadow-lip-sm text-espresso focus:outline-none"
+              className="p-2 rounded-xl border-[1.5px] border-espresso-border bg-white shadow-lip-sm text-espresso focus:outline-none"
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-      </div>
+      </div >
 
       {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-cream-light border-b border-espresso-border px-6 py-6 shadow-md animate-in slide-in-from-top-2 duration-200 relative z-20">
-          <nav className="flex flex-col gap-3 font-sans">
-            {NAV_LINKS.map((link) => (
-              <NavLink
-                key={link.href}
-                to={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center justify-between py-2.5 px-4 rounded-xl border-[1.5px] border-espresso-border font-semibold text-sm transition-all ${
-                    isActive
+      {
+        mobileMenuOpen && (
+          <div className="lg:hidden bg-cream-light border-b border-espresso-border px-6 py-6 shadow-md animate-in slide-in-from-top-2 duration-200 relative z-20">
+            <nav className="flex flex-col gap-3 font-sans">
+              {NAV_LINKS.map((link) => (
+                <NavLink
+                  key={link.href}
+                  to={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center justify-between py-2.5 px-4 rounded-xl border-[1.5px] border-espresso-border font-semibold text-sm transition-all ${isActive
                       ? 'bg-terracotta text-cream-light shadow-lip-sm'
                       : 'bg-cream text-espresso hover:bg-honey-soft'
-                  }`
-                }
-              >
-                <span>{link.label}</span>
-                <span className="text-xs">→</span>
-              </NavLink>
-            ))}
+                    }`
+                  }
+                >
+                  <span>{link.label}</span>
+                  <span className="text-xs">→</span>
+                </NavLink>
+              ))}
 
-            <a
-              href={CONTACT_DETAILS.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 bg-emerald text-white py-3 px-4 rounded-xl border-[1.5px] border-espresso-border shadow-lip-md font-semibold text-sm"
-            >
-              <MessageCircle className="w-4 h-4 fill-current" />
-              <span>WhatsApp us</span>
-            </a>
-          </nav>
-        </div>
-      )}
+              <a
+                href={CONTACT_DETAILS.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-2 flex items-center justify-center gap-2 bg-emerald text-white py-3 px-4 rounded-xl border-[1.5px] border-espresso-border shadow-lip-md font-semibold text-sm"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>WhatsApp us</span>
+              </a>
+            </nav>
+          </div>
+        )
+      }
 
       {/* Cloud Scalloped Hem Edge that fades in when scrolled */}
       <svg
         aria-hidden="true"
-        className={`tp-header__hem absolute top-[calc(100%-1px)] left-0 w-full h-3.5 transition-opacity duration-350 pointer-events-none ${
-          scrolled ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`tp-header__hem absolute top-[calc(100%-1px)] left-0 w-full h-3.5 transition-opacity duration-350 pointer-events-none ${scrolled ? 'opacity-100' : 'opacity-0'
+          }`}
         width="100%"
         height="14"
         preserveAspectRatio="none"
@@ -187,6 +183,6 @@ export const Navbar: React.FC = () => {
         </defs>
         <rect width="100%" height="14" fill="url(#tp-hem)" />
       </svg>
-    </header>
+    </header >
   );
 };

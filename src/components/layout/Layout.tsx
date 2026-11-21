@@ -21,15 +21,15 @@ export const Layout: React.FC = () => {
   const { isTransitioning } = useRouteTransition();
 
   return (
-    <div className="min-h-screen flex flex-col bg-cream text-espresso selection:bg-honey selection:text-espresso relative">
+    <div className="min-h-screen flex flex-col bg-white text-espresso selection:bg-honey selection:text-espresso relative">
       {/* Delicate Paw Step Trail canvas behind pointer */}
       <PawTrailCanvas />
 
       {/* Sticky Global Navigation */}
       <Navbar />
 
-      {/* Routed Page Content */}
-      <main id="main" className="flex-grow">
+      {/* Routed Page Content matching reference site */}
+      <main id="main" tabIndex={-1} className="relative pt-[var(--header-h)] flex-grow outline-none">
         <Outlet />
       </main>
 
