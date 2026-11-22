@@ -352,14 +352,14 @@ export const ContactPage: React.FC = () => {
                         href="https://wa.me/919898124987?text=Hi%20Insta%20Biz%20Web%2C%20I'd%20like%20to%20discuss%20a%20project."
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-whatsapp"
+                        className="btn btn-whatsapp  px-7 py-3 text-base font-semibold shrink-0"
                       >
                         WhatsApp us
                       </a>
                       <button
                         type="button"
                         onClick={handleReset}
-                        className="btn btn-ghost !bg-milk"
+                        className="btn btn-ghost !bg-milk  px-7 py-3 text-base font-semibold shrink-0"
                       >
                         Write another letter
                       </button>
