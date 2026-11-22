@@ -1,75 +1,97 @@
-# React + TypeScript + Vite
+# TeddyPups U.A.E. — Technical Assignment
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A complete, pixel-accurate clone of the [TeddyPups reference website](https://puppy.instabizweb.com/), developed for the Blutec AI Technical Round.
 
-Currently, two official plugins are available:
+**Live Demo:** [https://blutec-ai-technical-assignment.vercel.app/](https://blutec-ai-technical-assignment.vercel.app/)  
+**Reference Site:** [https://puppy.instabizweb.com/](https://puppy.instabizweb.com/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Screenshots
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Desktop Views
 
-## Expanding the ESLint configuration
+| Homepage Hero & Door Cards | Available Puppies Catalog |
+| :---: | :---: |
+| ![Homepage Desktop](screenshots/home-desktop.png) | ![Puppies Catalog](screenshots/puppies-catalog.png) |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Single Puppy Detail Page | Happy Families Gallery |
+| :---: | :---: |
+| ![Puppy Detail](screenshots/puppy-detail.png) | ![Happy Families](screenshots/happy-families.png) |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Mobile Responsiveness
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+<p align="center">
+  <img src="screenshots/mobile-home.png" alt="Mobile View" width="340" />
+</p>
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
 
-```
+## Features
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+- **8 Complete Routes**:
+  - `/` — Homepage with animated 3D arched door cards, flight arcs, puppy passport, and Polaroid testimonial shelf.
+  - `/puppies` — Sketchbook catalog with instant client-side filtering by collection, breed, and gender.
+  - `/puppies/:slug` — Individual puppy storybook pages with reading ribbon progress, photo carousel, and fullscreen lightbox.
+  - `/happy-families` — Photo memory board with keyboard-accessible modal viewer.
+  - `/how-it-works` — Tabbed guide covering showroom visits and international import processes.
+  - `/faq` — Interactive corkboard with pinned notes, live search, and question expansion.
+  - `/contact` — Interactive letterform with live typing feedback, postage stamp, and sealing animation.
+  - `/gone-home` — Archival boarding pass tickets for puppies in their forever homes.
+- **Micro-Interactions & Mascot**:
+  - Animated puppy mascot interacting across scenes and sitting on the mobile sticky contact bar.
+  - Tactile spring physics, curved scallop dividers, and custom cursor effects.
+- **SEO & Accessibility**:
+  - Dynamic document title and meta description updates on route change.
+  - Valid Schema.org structured data (`PetStore`, `FAQPage`, `BreadcrumbList`).
+  - OpenGraph, Twitter Card tags, `sitemap.xml`, and `robots.txt`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Tech Stack
 
-```
+- **Framework**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Bundler & Tooling**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + Custom OKLab Theme Tokens
+- **Animation**: [Framer Motion](https://www.framer.com/motion/)
+- **Routing**: [React Router v6](https://reactrouter.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or pnpm
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/shauryagupta2002/blutec-ai-technical-assignment.git
+   cd blutec-ai-technical-assignment
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Build for production:
+   ```bash
+   npm run build
+   ```
+
+---
+
+## Deployment
+
+The application is deployed on **Vercel** with automated continuous integration:
+- **Live URL**: [https://blutec-ai-technical-assignment.vercel.app/](https://blutec-ai-technical-assignment.vercel.app/)
